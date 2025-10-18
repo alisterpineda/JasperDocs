@@ -1,4 +1,4 @@
-namespace Index.Api;
+namespace Index.WebApi;
 
 public class WeatherForecast
 {

@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Index.Api\Index.Api.csproj" />
+    <ProjectReference Include="..\Index.WebApi\Index.WebApi.csproj" />
   </ItemGroup>
 
 </Project>

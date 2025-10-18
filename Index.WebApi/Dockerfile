@@ -12,19 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Index.Api/Index.Api.csproj", "Index.Api/"]
-RUN dotnet restore "./Index.Api/Index.Api.csproj"
+COPY ["Index.WebApi/Index.WebApi.csproj", "Index.WebApi/"]
+RUN dotnet restore "./Index.WebApi/Index.WebApi.csproj"
 COPY . .
-WORKDIR "/src/Index.Api"
-RUN dotnet build "./Index.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Index.WebApi"
+RUN dotnet build "./Index.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Index.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Index.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Index.Api.dll"]
+ENTRYPOINT ["dotnet", "Index.WebApi.dll"]
