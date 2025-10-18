@@ -23,6 +23,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": "../Index.WebApi/wwwroot",
             "browser": "src/main.ts",
             "polyfills": [
               "zone.js"

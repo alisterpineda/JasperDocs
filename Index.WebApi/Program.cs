@@ -1,3 +1,4 @@
+using Microsoft.Extensions.FileProviders;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,5 +27,16 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Serve static files from wwwroot/browser
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(app.Environment.ContentRootPath, "wwwroot", "browser")),
+    RequestPath = ""
+});
+
+// Fallback for Angular routing
+app.MapFallbackToFile("browser/index.html");
 
 app.Run();
