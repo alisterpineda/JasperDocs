@@ -366,3 +366,6 @@ FodyWeavers.xsd
 .idea/
 *.sln.iml
 *.csproj.iml
+
+# Claude
+.claude/settings.local.json
