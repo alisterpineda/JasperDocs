@@ -33,7 +33,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireAuthorization();
+
 app.MapIdentityApi<IdentityUser>();
 
 // Serve static files from wwwroot/browser
