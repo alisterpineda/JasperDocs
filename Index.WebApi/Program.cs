@@ -1,4 +1,6 @@
+using Index.WebApi.Core;
 using Index.WebApi.Entities;
+using Index.WebApi.Features.Documents;
 using Index.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "postgresdb");
+builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -36,7 +39,7 @@ app.UseAuthorization();
 
 app.MapControllers().RequireAuthorization();
 
-app.MapIdentityApi<IdentityUser>();
+app.MapIdentityApi<ApplicationUser>();
 
 // Serve static files from wwwroot/browser
 app.UseStaticFiles(new StaticFileOptions

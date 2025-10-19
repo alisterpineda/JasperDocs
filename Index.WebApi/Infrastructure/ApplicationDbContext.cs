@@ -11,6 +11,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) :
         base(options)
     { }
+    
+    public DbSet<Document> Documents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
