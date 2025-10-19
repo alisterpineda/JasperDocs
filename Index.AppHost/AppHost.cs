@@ -4,6 +4,7 @@ var postgres = builder.AddPostgres("postgres").WithPgWeb();
 var postgresDb = postgres.AddDatabase("postgresdb");
 
 builder.AddProject<Projects.Index_WebApi>("index-webapi")
-    .WithReference(postgresDb);
+    .WithReference(postgresDb)
+    .WaitFor(postgresDb);
 
 builder.Build().Run();

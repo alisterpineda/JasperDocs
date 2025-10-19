@@ -1,3 +1,6 @@
+using Index.WebApi.Infrastructure;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Scalar.AspNetCore;
 
@@ -6,10 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add services to the container.
+builder.AddNpgsqlDbContext<AppDbContext>(connectionName: "postgresdb");
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+    .AddEntityFrameworkStores<AppDbContext>();
 
 var app = builder.Build();
 
@@ -27,6 +34,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapIdentityApi<IdentityUser>();
 
 // Serve static files from wwwroot/browser
 app.UseStaticFiles(new StaticFileOptions
@@ -38,5 +46,13 @@ app.UseStaticFiles(new StaticFileOptions
 
 // Fallback for Angular routing
 app.MapFallbackToFile("browser/index.html");
+
+
+// TODO: Consider a different, safer migration approach later
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 app.Run();
