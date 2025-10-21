@@ -8,28 +8,28 @@ This is a .NET 9.0 Aspire application with an Angular 20 frontend. The solution 
 
 ## Solution Structure
 
-- **Index.AppHost**: .NET Aspire orchestration host that manages service dependencies and infrastructure (PostgreSQL with PgWeb)
-- **Index.WebApi**: ASP.NET Core Web API backend (.NET 9.0)
-- **Index.WebApp**: Angular 20 frontend application
-- **Index.ServiceDefaults**: Shared Aspire service configurations (OpenTelemetry, health checks, service discovery)
+- **JasperDocs.AppHost**: .NET Aspire orchestration host that manages service dependencies and infrastructure (PostgreSQL with PgWeb)
+- **JasperDocs.WebApi**: ASP.NET Core Web API backend (.NET 9.0)
+- **JasperDocs.WebApp**: Angular 20 frontend application
+- **JasperDocs.ServiceDefaults**: Shared Aspire service configurations (OpenTelemetry, health checks, service discovery)
 
 ## Build and Run Commands
 
 ### Running the entire application
 ```bash
-dotnet run --project Index.AppHost/Index.AppHost.csproj
+dotnet run --project JasperDocs.AppHost/JasperDocs.AppHost.csproj
 ```
 This starts the Aspire AppHost which orchestrates all services including PostgreSQL and the Web API.
 
 ### Backend (WebApi) only
 ```bash
-dotnet build Index.WebApi/Index.WebApi.csproj
-dotnet run --project Index.WebApi/Index.WebApi.csproj
+dotnet build JasperDocs.WebApi/JasperDocs.WebApi.csproj
+dotnet run --project JasperDocs.WebApi/JasperDocs.WebApi.csproj
 ```
 
 ### Frontend (WebApp) only
 ```bash
-cd Index.WebApp
+cd JasperDocs.WebApp
 npm install        # First time only
 npm start          # Runs ng serve on 127.0.0.1:4200
 npm run build      # Production build
@@ -39,16 +39,16 @@ npm test           # Run Karma/Jasmine tests
 ### Database Migrations
 ```bash
 # Add new migration
-dotnet ef migrations add <MigrationName> --project Index.WebApi
+dotnet ef migrations add <MigrationName> --project JasperDocs.WebApi
 
 # Apply migrations (also auto-applied on app startup in Program.cs)
-dotnet ef database update --project Index.WebApi
+dotnet ef database update --project JasperDocs.WebApi
 ```
 
 ### Testing
 ```bash
 # Frontend tests
-cd Index.WebApp
+cd JasperDocs.WebApp
 npm test
 ```
 
@@ -100,7 +100,7 @@ The WebApi serves the Angular build output:
 ### Database
 
 - PostgreSQL via Aspire's Npgsql provider
-- Connection string configured in AppHost: `builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "postgresdb")`
+- Connection string configured in AppHost: `builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase")`
 - Migrations auto-applied on startup (see TODO in Program.cs about safer migration approach)
 - PgWeb included for database management UI during development
 
@@ -119,11 +119,11 @@ The WebApi serves the Angular build output:
 1. Create entity class in `Entities/`
 2. Add `DbSet<TEntity>` property to `ApplicationDbContext`
 3. Create configuration class in `Infrastructure/EntityConfigurations/` (if needed for custom mappings)
-4. Run `dotnet ef migrations add <MigrationName> --project Index.WebApi`
+4. Run `dotnet ef migrations add <MigrationName> --project JasperDocs.WebApi`
 
 ### Aspire Service Defaults
 
-The `Index.ServiceDefaults` project provides common Aspire infrastructure:
+The `JasperDocs.ServiceDefaults` project provides common Aspire infrastructure:
 - OpenTelemetry (metrics, tracing, logging)
 - Health checks at `/health` and `/alive` (development only)
 - Service discovery
