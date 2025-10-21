@@ -76,6 +76,36 @@ Register handlers in `Program.cs`:
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
 ```
 
+### Request/Response Flow
+
+**Handler Interfaces** (`Core/IRequestHandler.cs`):
+```csharp
+IRequestHandler<TRequest, TResponse>  // Returns Task<TResponse>
+IRequestHandler<TRequest>             // Returns Task (no response data)
+```
+
+**Controller Pattern** - Inject handlers per endpoint via `[FromServices]`:
+```csharp
+[HttpPost]
+public Task CreateAsync(
+    [FromServices] IRequestHandler<CreateDocument> handler,
+    [FromBody] CreateDocument request,
+    CancellationToken ct = default)
+{
+    return handler.HandleAsync(request, ct);
+}
+```
+
+**Authentication Helpers** (`Core/HttpContextAccessorExtensions.cs`):
+- `httpContextAccessor.GetUserId()` → `Guid?` from ClaimTypes.NameIdentifier
+- `httpContextAccessor.IsAuthenticated()` → `bool`
+
+**Example Flow**:
+1. Request DTO: `CreateDocument.cs` (POCO with required/optional properties)
+2. Handler: `CreateDocumentHandler : IRequestHandler<CreateDocument>` (constructor injection for dependencies)
+3. Controller: Inject handler via `[FromServices]`, deserialize body via `[FromBody]`
+4. Registration: `AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>()`
+
 ### Entity Configuration
 
 Entity configurations are separate from entities and auto-discovered:
