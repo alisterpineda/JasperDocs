@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JasperDocs.ServiceDefaults"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JasperDocs.WebApi", "JasperDocs.WebApi\JasperDocs.WebApi.csproj", "{BCCC51CF-10CF-B770-8D24-02B44386F588}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "JasperDocs.WebApp", "JasperDocs.WebApp\JasperDocs.WebApp.esproj", "{53343208-D378-AE91-29CB-FBBB5BE1166D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,12 @@ Global
 		{BCCC51CF-10CF-B770-8D24-02B44386F588}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCCC51CF-10CF-B770-8D24-02B44386F588}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCCC51CF-10CF-B770-8D24-02B44386F588}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53343208-D378-AE91-29CB-FBBB5BE1166D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53343208-D378-AE91-29CB-FBBB5BE1166D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53343208-D378-AE91-29CB-FBBB5BE1166D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{53343208-D378-AE91-29CB-FBBB5BE1166D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53343208-D378-AE91-29CB-FBBB5BE1166D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53343208-D378-AE91-29CB-FBBB5BE1166D}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
