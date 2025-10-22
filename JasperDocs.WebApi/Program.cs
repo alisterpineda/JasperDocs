@@ -11,6 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add services to the container.
+// During OpenAPI generation, provide a dummy connection string if none exists
+var connectionString = builder.Configuration.GetConnectionString("AppDatabase");
+if (string.IsNullOrEmpty(connectionString))
+{
+    builder.Configuration["ConnectionStrings:AppDatabase"] = "Host=localhost;Database=dummy;Username=dummy;Password=dummy";
+}
 builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase");
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
 
@@ -70,10 +76,14 @@ if (!app.Environment.IsDevelopment())
 
 
 // TODO: Consider a different, safer migration approach later
-using (var scope = app.Services.CreateScope())
+// Skip migration if connection string is missing (e.g., during OpenAPI generation)
+if (!string.IsNullOrEmpty(connectionString))
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await db.Database.MigrateAsync();
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await db.Database.MigrateAsync();
+    }
 }
 
 app.Run();

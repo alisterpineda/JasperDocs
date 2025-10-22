@@ -135,6 +135,27 @@ Entity configurations are separate from entities and auto-discovered:
 - WebApi serves static files from `wwwroot/`
 - Fallback routing to `index.html` for React Router
 
+### API Client (Frontend)
+
+Uses **Orval** to generate type-safe TanStack Query hooks from OpenAPI. Axios handles HTTP with auth interceptors.
+
+**Regenerate after API changes**:
+```bash
+dotnet build JasperDocs.WebApi/JasperDocs.WebApi.csproj
+cd JasperDocs.WebApp && npm run api:generate
+# Commit generated code in src/api/generated/
+```
+
+**Usage**:
+```typescript
+import { usePostDocuments } from './api/generated/documents/documents';
+const mutation = usePostDocuments();
+await mutation.mutateAsync({ data: {...} });
+```
+
+**Auth**: `localStorage.authToken` auto-injected via axios interceptor. See `src/api/axios-instance.ts` for 401 handling.
+**Config**: `orval.config.ts`, `src/main.tsx` (QueryClientProvider, 5min cache)
+
 ### Database
 
 - PostgreSQL via Aspire's Npgsql provider
