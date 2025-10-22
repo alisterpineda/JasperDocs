@@ -40,6 +40,7 @@ if (builder.Environment.IsDevelopment())
 }
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+    .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 var app = builder.Build();
@@ -83,6 +84,7 @@ if (!string.IsNullOrEmpty(connectionString))
     {
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await db.Database.MigrateAsync();
+        await DatabaseSeeder.SeedAsync(app.Services);
     }
 }
 
