@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JasperDocs.AppHost", "Jaspe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JasperDocs.ServiceDefaults", "JasperDocs.ServiceDefaults\JasperDocs.ServiceDefaults.csproj", "{7B03E9DE-EF62-90C3-9A85-8FC67548A471}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "JasperDocs.WebApp", "JasperDocs.WebApp\JasperDocs.WebApp.esproj", "{AC2BFF36-EEE9-6B8B-F787-716768B94026}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JasperDocs.WebApi", "JasperDocs.WebApi\JasperDocs.WebApi.csproj", "{BCCC51CF-10CF-B770-8D24-02B44386F588}"
 EndProject
 Global
@@ -24,12 +22,6 @@ Global
 		{7B03E9DE-EF62-90C3-9A85-8FC67548A471}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B03E9DE-EF62-90C3-9A85-8FC67548A471}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B03E9DE-EF62-90C3-9A85-8FC67548A471}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AC2BFF36-EEE9-6B8B-F787-716768B94026}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AC2BFF36-EEE9-6B8B-F787-716768B94026}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AC2BFF36-EEE9-6B8B-F787-716768B94026}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{AC2BFF36-EEE9-6B8B-F787-716768B94026}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AC2BFF36-EEE9-6B8B-F787-716768B94026}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AC2BFF36-EEE9-6B8B-F787-716768B94026}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{BCCC51CF-10CF-B770-8D24-02B44386F588}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BCCC51CF-10CF-B770-8D24-02B44386F588}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCCC51CF-10CF-B770-8D24-02B44386F588}.Release|Any CPU.ActiveCfg = Release|Any CPU
