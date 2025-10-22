@@ -1,10 +1,22 @@
+using Microsoft.Extensions.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres").WithPgWeb();
 var postgresDb = postgres.AddDatabase("AppDatabase", "jasper-docs");
 
-builder.AddProject<Projects.JasperDocs_WebApi>("jasperdocs-webapi")
+var webApi = builder.AddProject<Projects.JasperDocs_WebApi>("jasperdocs-webapi")
     .WithReference(postgresDb)
     .WaitFor(postgresDb);
+
+// In development, run Vite dev server for HMR
+if (builder.Environment.IsDevelopment())
+{
+    builder.AddNpmApp("jasperdocs-webapp", "../JasperDocs.WebApp", "dev")
+        .WithHttpEndpoint(port: 5173, isProxied: false)
+        .WithExternalHttpEndpoints()
+        .WithReference(webApi)
+        .WaitFor(webApi);
+}
 
 builder.Build().Run();

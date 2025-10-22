@@ -19,7 +19,9 @@ This is a .NET 9.0 Aspire application with a React 19 frontend. The solution fol
 ```bash
 dotnet run --project JasperDocs.AppHost/JasperDocs.AppHost.csproj
 ```
-This starts the Aspire AppHost which orchestrates all services including PostgreSQL and the Web API.
+This starts the Aspire AppHost which orchestrates all services:
+- **Development mode**: Starts PostgreSQL, WebApi, and Vite dev server (port 5173) with HMR
+- **Production mode**: Starts PostgreSQL and WebApi only (React served as static files from wwwroot)
 
 ### Backend (WebApi) only
 ```bash
@@ -122,9 +124,15 @@ Entity configurations are separate from entities and auto-discovered:
 
 ### Frontend Integration
 
-The WebApi serves the React build output:
-- React build artifacts from `dist/` placed in `wwwroot/`
-- Static files served from root path
+**Development mode** (default when running AppHost):
+- Vite dev server runs separately via Aspire on port 5173 with HMR
+- CORS enabled on WebApi for localhost:5173
+- Static file serving disabled in WebApi
+
+**Production/Release mode**:
+- MSBuild target auto-builds React before WebApi build (Release configuration only)
+- Build output goes to `wwwroot/` (configured in vite.config.ts)
+- WebApi serves static files from `wwwroot/`
 - Fallback routing to `index.html` for React Router
 
 ### Database

@@ -18,6 +18,21 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Add CORS for Vite dev server in development
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("ViteDevServer", policy =>
+        {
+            policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+    });
+}
+
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -34,17 +49,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Use CORS for Vite dev server in development
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("ViteDevServer");
+}
+
 app.UseAuthorization();
 
 app.MapControllers().RequireAuthorization();
 
 app.MapIdentityApi<ApplicationUser>();
 
-// Serve static files from wwwroot
-app.UseStaticFiles();
-
-// Fallback for React routing
-app.MapFallbackToFile("index.html");
+// Serve React app from wwwroot (production only)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseStaticFiles();
+    app.MapFallbackToFile("index.html");
+}
 
 
 // TODO: Consider a different, safer migration approach later

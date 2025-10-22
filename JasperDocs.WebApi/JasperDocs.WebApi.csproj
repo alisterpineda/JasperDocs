@@ -28,4 +28,18 @@
     <Folder Include="Infrastructure\Migrations\" />
   </ItemGroup>
 
+  <!-- Build React frontend before building the API (only in Release mode) -->
+  <Target Name="BuildReactApp" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <Message Text="Building React frontend..." Importance="high" />
+
+    <!-- Install dependencies if node_modules doesn't exist -->
+    <Exec Command="npm install"
+          WorkingDirectory="$(MSBuildThisFileDirectory)../JasperDocs.WebApp"
+          Condition="!Exists('$(MSBuildThisFileDirectory)../JasperDocs.WebApp/node_modules')" />
+
+    <!-- Build React app (outputs directly to wwwroot via vite.config.ts) -->
+    <Exec Command="npm run build"
+          WorkingDirectory="$(MSBuildThisFileDirectory)../JasperDocs.WebApp" />
+  </Target>
+
 </Project>
