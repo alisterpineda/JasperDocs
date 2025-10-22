@@ -4,7 +4,6 @@ using JasperDocs.WebApi.Features.Documents;
 using JasperDocs.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,16 +40,11 @@ app.MapControllers().RequireAuthorization();
 
 app.MapIdentityApi<ApplicationUser>();
 
-// Serve static files from wwwroot/browser
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(app.Environment.ContentRootPath, "wwwroot", "browser")),
-    RequestPath = ""
-});
+// Serve static files from wwwroot
+app.UseStaticFiles();
 
-// Fallback for Angular routing
-app.MapFallbackToFile("browser/index.html");
+// Fallback for React routing
+app.MapFallbackToFile("index.html");
 
 
 // TODO: Consider a different, safer migration approach later

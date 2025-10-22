@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a .NET 9.0 Aspire application with an Angular 20 frontend. The solution follows a vertical slice architecture pattern for the backend and uses ASP.NET Core Identity with PostgreSQL for user management.
+This is a .NET 9.0 Aspire application with a React 19 frontend. The solution follows a vertical slice architecture pattern for the backend and uses ASP.NET Core Identity with PostgreSQL for user management.
 
 ## Solution Structure
 
 - **JasperDocs.AppHost**: .NET Aspire orchestration host that manages service dependencies and infrastructure (PostgreSQL with PgWeb)
 - **JasperDocs.WebApi**: ASP.NET Core Web API backend (.NET 9.0)
-- **JasperDocs.WebApp**: Angular 20 frontend application
+- **JasperDocs.WebApp**: React 19 frontend application (Vite + TypeScript)
 - **JasperDocs.ServiceDefaults**: Shared Aspire service configurations (OpenTelemetry, health checks, service discovery)
 
 ## Build and Run Commands
@@ -31,9 +31,9 @@ dotnet run --project JasperDocs.WebApi/JasperDocs.WebApi.csproj
 ```bash
 cd JasperDocs.WebApp
 npm install        # First time only
-npm start          # Runs ng serve on 127.0.0.1:4200
-npm run build      # Production build
-npm test           # Run Karma/Jasmine tests
+npm run dev        # Runs Vite dev server on localhost:5173
+npm run build      # Production build (outputs to dist/)
+npm run preview    # Preview production build
 ```
 
 ### Database Migrations
@@ -47,9 +47,9 @@ dotnet ef database update --project JasperDocs.WebApi
 
 ### Testing
 ```bash
-# Frontend tests
+# Frontend linting
 cd JasperDocs.WebApp
-npm test
+npm run lint
 ```
 
 ## Architecture Patterns
@@ -122,10 +122,10 @@ Entity configurations are separate from entities and auto-discovered:
 
 ### Frontend Integration
 
-The WebApi serves the Angular build output:
-- Angular build artifacts placed in `wwwroot/browser`
+The WebApi serves the React build output:
+- React build artifacts from `dist/` placed in `wwwroot/`
 - Static files served from root path
-- Fallback routing to `browser/index.html` for Angular routing
+- Fallback routing to `index.html` for React Router
 
 ### Database
 
