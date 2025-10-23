@@ -12,6 +12,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
+// Map environment variable to configuration
+var dataDirPath = builder.Configuration["DATA_DIR_PATH"];
+if (!string.IsNullOrEmpty(dataDirPath))
+{
+    var inMemorySettings = new Dictionary<string, string?>
+    {
+        [$"{StorageOptions.SectionName}:DataDirectoryPath"] = dataDirPath
+    };
+    builder.Configuration.AddInMemoryCollection(inMemorySettings);
+}
+
+// Configure storage options using proper binding
+builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection(StorageOptions.SectionName));
+
 // Add services to the container.
 builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase");
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();

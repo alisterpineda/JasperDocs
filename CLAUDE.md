@@ -147,6 +147,22 @@ Entity configurations are separate from entities and auto-discovered:
 - Email: `admin@jasperdocs.local`
 - Password: Randomly generated, logged to console (check WebApi logs in Aspire Dashboard)
 
+### Configuration: Options Pattern
+
+**StorageOptions** (`Core/StorageOptions.cs`): Configures file storage location
+- `DataDirectoryPath`: Root directory for document uploads
+- Configured via `DATA_DIR_PATH` environment variable
+- Mapped to `Storage:DataDirectoryPath` config key using in-memory provider
+- Injected via `IOptionsMonitor<StorageOptions>` for dynamic configuration updates
+
+**Usage**:
+```csharp
+public class MyHandler(IOptionsMonitor<StorageOptions> storageOptions)
+{
+    var path = storageOptions.CurrentValue.DataDirectoryPath;
+}
+```
+
 ### Frontend Architecture
 
 **UI Framework**: Mantine v7 with Tabler Icons
