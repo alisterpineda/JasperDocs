@@ -15,6 +15,7 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase");
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
+builder.Services.AddScoped<IRequestHandler<CreateDocumentVersion>, CreateDocumentVersionHandler>();
 builder.Services.AddScoped<IRequestHandler<LoginRequest, Microsoft.AspNetCore.Identity.SignInResult>, LoginHandler>();
 
 builder.Services.AddControllers(options =>

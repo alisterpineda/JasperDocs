@@ -12,4 +12,10 @@ public class DocumentsController : ControllerBase
     {
         return requestHandler.HandleAsync(request, ct);
     }
+
+    [HttpPost("versions")]
+    public Task CreateDocumentVersionAsync([FromServices] IRequestHandler<CreateDocumentVersion> requestHandler, [FromBody] CreateDocumentVersion request, CancellationToken ct = default)
+    {
+        return requestHandler.HandleAsync(request, ct);
+    }
 }

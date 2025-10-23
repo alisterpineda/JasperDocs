@@ -18,13 +18,25 @@ public class CreateDocumentHandler : IRequestHandler<CreateDocument>
     
     public async Task HandleAsync(CreateDocument request, CancellationToken ct = default)
     {
+        var userId = _httpContextAccessor.GetUserId();
+
         var newDocument = new Document
         {
             Title = request.Title,
-            Description = request.Description ?? string.Empty,
-            CreatedByUserId = _httpContextAccessor.GetUserId()
+            Description = request.Description,
+            CreatedByUserId = userId
         };
+
+        var initialVersion = new DocumentVersion
+        {
+            Document = newDocument,
+            VersionNumber = 1,
+            Description = "Initial version",
+            CreatedByUserId = userId
+        };
+
         _context.Documents.Add(newDocument);
+        _context.DocumentVersions.Add(initialVersion);
         await _context.SaveChangesAsync(ct);
     }
 }

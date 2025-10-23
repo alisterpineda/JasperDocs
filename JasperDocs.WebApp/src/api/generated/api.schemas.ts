@@ -17,6 +17,12 @@ export interface CreateDocument {
   description?: string | null;
 }
 
+export interface CreateDocumentVersion {
+  documentId: string;
+  /** @nullable */
+  description?: string | null;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

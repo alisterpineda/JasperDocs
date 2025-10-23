@@ -15,7 +15,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  CreateDocument
+  CreateDocument,
+  CreateDocumentVersion
 } from '../api.schemas';
 
 import { customAxiosInstance } from '../../axios-instance';
@@ -78,6 +79,64 @@ const {mutation: mutationOptions} = options ?
       > => {
 
       const mutationOptions = getPostApiDocumentsMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    export const postApiDocumentsVersions = (
+    createDocumentVersion: CreateDocumentVersion,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customAxiosInstance<void>(
+      {url: `/api/Documents/versions`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createDocumentVersion, signal
+    },
+      );
+    }
+  
+
+
+export const getPostApiDocumentsVersionsMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocumentsVersions>>, TError,{data: CreateDocumentVersion}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postApiDocumentsVersions>>, TError,{data: CreateDocumentVersion}, TContext> => {
+
+const mutationKey = ['postApiDocumentsVersions'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiDocumentsVersions>>, {data: CreateDocumentVersion}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postApiDocumentsVersions(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiDocumentsVersionsMutationResult = NonNullable<Awaited<ReturnType<typeof postApiDocumentsVersions>>>
+    export type PostApiDocumentsVersionsMutationBody = CreateDocumentVersion
+    export type PostApiDocumentsVersionsMutationError = unknown
+
+    export const usePostApiDocumentsVersions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocumentsVersions>>, TError,{data: CreateDocumentVersion}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiDocumentsVersions>>,
+        TError,
+        {data: CreateDocumentVersion},
+        TContext
+      > => {
+
+      const mutationOptions = getPostApiDocumentsVersionsMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

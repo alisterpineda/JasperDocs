@@ -1,18 +1,18 @@
 namespace JasperDocs.WebApi.Entities;
 
-public class Document
+public class DocumentVersion
 {
     public Guid Id { get; set; }
-    public required string Title { get; set; }
+    public Guid DocumentId { get; set; }
+    public int VersionNumber { get; set; }
     public string? Description { get; set; }
     public DateTime CreatedAt { get; init; }
-    public DateTime UpdatedAt { get; set; }
     public Guid? CreatedByUserId { get; init; }
 
     #region Navigation Properties
 
+    public Document Document { get; init; } = null!;
     public ApplicationUser? CreatedByUser { get; init; }
-    public ICollection<DocumentVersion> Versions { get; set; } = new List<DocumentVersion>();
 
     #endregion
 }

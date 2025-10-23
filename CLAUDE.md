@@ -82,6 +82,21 @@ Register handlers in `Program.cs`:
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
 ```
 
+### Domain Model: Documents and Versioning
+
+**Document** is an aggregate root with **DocumentVersion** child entities:
+- Document: Title, Description (nullable), CreatedByUserId, Versions collection
+- DocumentVersion: DocumentId, VersionNumber (int), Description (nullable), CreatedByUserId, CreatedAt
+- Unique constraint: (DocumentId, VersionNumber)
+- Cascade delete: Deleting Document removes all Versions
+
+**Versioning Behavior**:
+- Creating a Document auto-creates Version 1 (see `CreateDocumentHandler`)
+- Version numbers auto-increment (finds max + 1)
+- Create new version: POST `/api/documents/versions` with `{ documentId, description? }`
+
+**DDD Pattern**: All Document-related endpoints under `DocumentsController` since Document is the aggregate root.
+
 ### Request/Response Flow
 
 **Handler Interfaces** (`Core/IRequestHandler.cs`):
@@ -117,6 +132,7 @@ public Task CreateAsync(
 Entity configurations are separate from entities and auto-discovered:
 - Entity classes in `Entities/`
 - Configuration classes in `Infrastructure/EntityConfigurations/` implementing `IEntityTypeConfiguration<T>`
+- Naming convention: `{EntityName}EntityTypeConfiguration.cs` (e.g., `DocumentEntityTypeConfiguration.cs`)
 - Configurations are auto-applied via `modelBuilder.ApplyConfigurationsFromAssembly()` in `ApplicationDbContext.OnModelCreating()`
 
 ### Identity and Authentication
