@@ -124,7 +124,35 @@ Entity configurations are separate from entities and auto-discovered:
 - Custom authentication endpoints in `Features/Authentication/` (vertical slice pattern)
 - All controllers require authorization by default: `app.MapControllers().RequireAuthorization()`
 
-### Frontend Integration
+### Frontend Architecture
+
+**UI Framework**: Mantine v7 with Tabler Icons
+- All components wrapped in `MantineProvider` (`main.tsx`)
+- CSS imported via `@mantine/core/styles.css`
+
+**Layout Pattern**: Mantine AppShell (`components/Layout/AppLayout.tsx`)
+- Navbar (60px height) with branding + auth UI
+- Collapsible sidebar (250px, collapses on mobile)
+- Login page bypasses layout shell
+
+**Authentication**: Context-based (`contexts/AuthContext.tsx`)
+- State: `isAuthenticated`, `user`, `login()`, `logout()`
+- Token storage: `localStorage.authToken` (auto-injected by axios)
+- Protected routes redirect to `/login` if unauthenticated
+
+**Routing**: React Router v6
+- `/` - Home page
+- `/documents` - Protected documents page
+- `/login` - Authentication page (mock implementation, TODO: integrate with `/login` API)
+
+**Structure**:
+```
+src/
+  components/Layout/  # AppLayout, Navbar, Sidebar
+  pages/              # Home, Documents, Login
+  contexts/           # AuthContext
+  api/                # Generated clients, axios config
+```
 
 **Development mode** (default when running AppHost):
 - Vite dev server runs separately via Aspire on port 5173 with HMR
