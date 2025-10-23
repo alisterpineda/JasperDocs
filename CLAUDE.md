@@ -73,6 +73,8 @@ Each feature contains its:
 - Request/Response DTOs
 - Request handlers implementing `IRequestHandler<TRequest>` or `IRequestHandler<TRequest, TResponse>`
 
+**Important**: Handlers return domain types (e.g., `SignInResult`), controllers convert to HTTP responses (e.g., `TypedResults.Problem()`)
+
 Register handlers in `Program.cs`:
 ```csharp
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
@@ -117,9 +119,9 @@ Entity configurations are separate from entities and auto-discovered:
 
 ### Identity and Authentication
 
-- Uses ASP.NET Core Identity with `ApplicationUser : IdentityUser<Guid>`
-- Identity tables use `Guid` as primary key type
-- Identity API endpoints mapped via `app.MapIdentityApi<ApplicationUser>()`
+- Uses ASP.NET Core Identity with `ApplicationUser : IdentityUser<Guid>` (Guid primary keys)
+- Configured with `AddIdentityApiEndpoints<ApplicationUser>()` for bearer token support
+- Custom authentication endpoints in `Features/Authentication/` (vertical slice pattern)
 - All controllers require authorization by default: `app.MapControllers().RequireAuthorization()`
 
 ### Frontend Integration
@@ -169,9 +171,10 @@ await mutation.mutateAsync({ data: {...} });
 
 1. Create feature folder under `Features/`
 2. Add request/response DTOs
-3. Create handler implementing `IRequestHandler<>`
-4. Add controller with endpoints
-5. Register handler in `Program.cs`
+3. Create handler implementing `IRequestHandler<>` (return domain types, not HTTP types)
+4. Add controller with endpoints (convert domain results to HTTP responses)
+5. Add `[ProducesResponseType<T>]` attributes for OpenAPI documentation
+6. Register handler in `Program.cs`
 
 ### Adding a New Entity
 

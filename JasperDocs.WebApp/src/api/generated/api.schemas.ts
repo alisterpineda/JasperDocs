@@ -5,8 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 export interface AccessTokenResponse {
-  /** @nullable */
-  tokenType?: string | null;
+  tokenType: string;
   accessToken: string;
   expiresIn: number;
   refreshToken: string;
@@ -18,13 +17,16 @@ export interface CreateDocument {
   description?: string | null;
 }
 
-export interface ForgotPasswordRequest {
+export interface LoginRequest {
   email: string;
+  password: string;
+  /** @nullable */
+  twoFactorCode?: string | null;
+  /** @nullable */
+  twoFactorRecoveryCode?: string | null;
 }
 
-export type HttpValidationProblemDetailsErrors = {[key: string]: string[]};
-
-export interface HttpValidationProblemDetails {
+export interface ProblemDetails {
   /** @nullable */
   type?: string | null;
   /** @nullable */
@@ -35,68 +37,6 @@ export interface HttpValidationProblemDetails {
   detail?: string | null;
   /** @nullable */
   instance?: string | null;
-  errors?: HttpValidationProblemDetailsErrors;
-}
-
-export interface InfoRequest {
-  /** @nullable */
-  newEmail?: string | null;
-  /** @nullable */
-  newPassword?: string | null;
-  /** @nullable */
-  oldPassword?: string | null;
-}
-
-export interface InfoResponse {
-  email: string;
-  isEmailConfirmed: boolean;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-  /** @nullable */
-  twoFactorCode?: string | null;
-  /** @nullable */
-  twoFactorRecoveryCode?: string | null;
-}
-
-export interface RefreshRequest {
-  refreshToken: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  password: string;
-}
-
-export interface ResendConfirmationEmailRequest {
-  email: string;
-}
-
-export interface ResetPasswordRequest {
-  email: string;
-  resetCode: string;
-  newPassword: string;
-}
-
-export interface TwoFactorRequest {
-  /** @nullable */
-  enable?: boolean | null;
-  /** @nullable */
-  twoFactorCode?: string | null;
-  resetSharedKey?: boolean;
-  resetRecoveryCodes?: boolean;
-  forgetMachine?: boolean;
-}
-
-export interface TwoFactorResponse {
-  sharedKey: string;
-  recoveryCodesLeft: number;
-  /** @nullable */
-  recoveryCodes?: string[] | null;
-  isTwoFactorEnabled: boolean;
-  isMachineRemembered: boolean;
 }
 
 export interface WeatherForecast {
@@ -106,15 +46,4 @@ export interface WeatherForecast {
   /** @nullable */
   summary?: string | null;
 }
-
-export type PostLoginParams = {
-useCookies?: boolean;
-useSessionCookies?: boolean;
-};
-
-export type MapIdentityApiConfirmEmailParams = {
-userId: string;
-code: string;
-changedEmail?: string;
-};
 

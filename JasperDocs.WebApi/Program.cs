@@ -1,9 +1,11 @@
 using JasperDocs.WebApi.Core;
 using JasperDocs.WebApi.Entities;
+using JasperDocs.WebApi.Features.Authentication;
 using JasperDocs.WebApi.Features.Documents;
 using JasperDocs.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,10 +15,28 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase");
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
+builder.Services.AddScoped<IRequestHandler<LoginRequest, Microsoft.AspNetCore.Identity.SignInResult>, LoginHandler>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes ??= new Dictionary<string, OpenApiSecurityScheme>();
+
+        document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            Description = "Enter the Bearer token obtained from the /login endpoint"
+        };
+
+        return Task.CompletedTask;
+    });
+});
 
 // Add CORS for Vite dev server in development
 if (builder.Environment.IsDevelopment())
@@ -59,8 +79,6 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers().RequireAuthorization();
-
-app.MapIdentityApi<ApplicationUser>();
 
 // Serve React app from wwwroot (production only)
 if (!app.Environment.IsDevelopment())
