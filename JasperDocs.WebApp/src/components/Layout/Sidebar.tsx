@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { Stack } from '@mantine/core';
 import { IconFiles } from '@tabler/icons-react';
 import classes from './Sidebar.module.css';
@@ -6,15 +6,16 @@ import classes from './Sidebar.module.css';
 export function Sidebar() {
   return (
     <Stack gap="xs" p="md">
-      <NavLink
+      <Link
         to="/documents"
-        className={({ isActive }) =>
-          isActive ? `${classes.link} ${classes.active}` : classes.link
-        }
+        className={classes.link}
+        activeProps={{
+          className: `${classes.link} ${classes.active}`,
+        }}
       >
         <IconFiles size={20} stroke={1.5} />
         <span>Documents</span>
-      </NavLink>
+      </Link>
     </Stack>
   );
 }

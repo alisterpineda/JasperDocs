@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import {
   TextInput,
   PasswordInput,
@@ -37,7 +37,7 @@ export function Login() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       const mockToken = 'mock-jwt-token';
       login(mockToken, email);
-      navigate('/');
+      navigate({ to: '/' });
     } catch (err) {
       setError('Login failed. Please try again.');
     } finally {

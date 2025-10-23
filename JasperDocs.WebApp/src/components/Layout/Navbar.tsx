@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { Group, Button, Menu, Avatar, Text, UnstyledButton, Burger } from '@mantine/core';
 import { IconLogout, IconUser } from '@tabler/icons-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -15,7 +15,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate({ to: '/login' });
   };
 
   return (
@@ -59,7 +59,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
             </Menu.Dropdown>
           </Menu>
         ) : (
-          <Button onClick={() => navigate('/login')}>
+          <Button onClick={() => navigate({ to: '/login' })}>
             Sign In
           </Button>
         )}
