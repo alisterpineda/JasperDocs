@@ -11,12 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add services to the container.
-// During OpenAPI generation, provide a dummy connection string if none exists
-var connectionString = builder.Configuration.GetConnectionString("AppDatabase");
-if (string.IsNullOrEmpty(connectionString))
-{
-    builder.Configuration["ConnectionStrings:AppDatabase"] = "Host=localhost;Database=dummy;Username=dummy;Password=dummy";
-}
 builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase");
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
 
@@ -78,13 +72,25 @@ if (!app.Environment.IsDevelopment())
 
 // TODO: Consider a different, safer migration approach later
 // Skip migration if connection string is missing (e.g., during OpenAPI generation)
-if (!string.IsNullOrEmpty(connectionString))
+using (var scope = app.Services.CreateScope())
 {
-    using (var scope = app.Services.CreateScope())
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("AppDatabase");
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    if (!string.IsNullOrEmpty(connectionString))
     {
+        logger.LogInformation("Applying database migrations...");
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await db.Database.MigrateAsync();
+        logger.LogInformation("Database migrations completed successfully");
+
         await DatabaseSeeder.SeedAsync(app.Services);
+        logger.LogInformation("Database seeding completed");
+    }
+    else
+    {
+        logger.LogWarning("No connection string found. Skipping database migrations");
     }
 }
 

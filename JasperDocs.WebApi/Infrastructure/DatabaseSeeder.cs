@@ -12,7 +12,7 @@ public static class DatabaseSeeder
     {
         using var scope = services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<ApplicationDbContext>>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(typeof(DatabaseSeeder));
 
         // Only seed if there are zero users in the database
         if (await userManager.Users.AnyAsync())
