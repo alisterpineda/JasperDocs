@@ -11,6 +11,20 @@ export default defineConfig({
     }),
     react(),
   ],
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        // Use VITE_API_URL from Aspire, or fall back to localhost:5000 for standalone dev
+        target: process.env.VITE_API_URL || 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy, options) => {
+          console.log('[Vite Proxy] Proxying /api requests to:', options.target);
+        },
+      }
+    }
+  },
   build: {
     outDir: '../JasperDocs.WebApi/wwwroot',
     emptyOutDir: true,

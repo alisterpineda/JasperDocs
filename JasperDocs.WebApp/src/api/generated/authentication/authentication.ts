@@ -25,14 +25,14 @@ import { customAxiosInstance } from '../../axios-instance';
 
 
 
-export const postLogin = (
+export const postApiLogin = (
     loginRequest: LoginRequest,
  signal?: AbortSignal
 ) => {
       
       
       return customAxiosInstance<AccessTokenResponse>(
-      {url: `/login`, method: 'POST',
+      {url: `/api/login`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: loginRequest, signal
     },
@@ -41,11 +41,11 @@ export const postLogin = (
   
 
 
-export const getPostLoginMutationOptions = <TError = ProblemDetails | ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: LoginRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: LoginRequest}, TContext> => {
+export const getPostApiLoginMutationOptions = <TError = ProblemDetails | ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiLogin>>, TError,{data: LoginRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postApiLogin>>, TError,{data: LoginRequest}, TContext> => {
 
-const mutationKey = ['postLogin'];
+const mutationKey = ['postApiLogin'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -55,10 +55,10 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLogin>>, {data: LoginRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiLogin>>, {data: LoginRequest}> = (props) => {
           const {data} = props ?? {};
 
-          return  postLogin(data,)
+          return  postApiLogin(data,)
         }
 
         
@@ -66,20 +66,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostLoginMutationResult = NonNullable<Awaited<ReturnType<typeof postLogin>>>
-    export type PostLoginMutationBody = LoginRequest
-    export type PostLoginMutationError = ProblemDetails | ProblemDetails
+    export type PostApiLoginMutationResult = NonNullable<Awaited<ReturnType<typeof postApiLogin>>>
+    export type PostApiLoginMutationBody = LoginRequest
+    export type PostApiLoginMutationError = ProblemDetails | ProblemDetails
 
-    export const usePostLogin = <TError = ProblemDetails | ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: LoginRequest}, TContext>, }
+    export const usePostApiLogin = <TError = ProblemDetails | ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiLogin>>, TError,{data: LoginRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postLogin>>,
+        Awaited<ReturnType<typeof postApiLogin>>,
         TError,
         {data: LoginRequest},
         TContext
       > => {
 
-      const mutationOptions = getPostLoginMutationOptions(options);
+      const mutationOptions = getPostApiLoginMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

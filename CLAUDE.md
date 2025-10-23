@@ -73,7 +73,9 @@ Each feature contains its:
 - Request/Response DTOs
 - Request handlers implementing `IRequestHandler<TRequest>` or `IRequestHandler<TRequest, TResponse>`
 
-**Important**: Handlers return domain types (e.g., `SignInResult`), controllers convert to HTTP responses (e.g., `TypedResults.Problem()`)
+**Important**:
+- Handlers return domain types (e.g., `SignInResult`), controllers convert to HTTP responses (e.g., `TypedResults.Problem()`)
+- All API endpoints are prefixed with `/api` via `RoutePrefixConvention` (e.g., `/api/login`, `/api/documents`)
 
 Register handlers in `Program.cs`:
 ```csharp
@@ -123,6 +125,11 @@ Entity configurations are separate from entities and auto-discovered:
 - Configured with `AddIdentityApiEndpoints<ApplicationUser>()` for bearer token support
 - Custom authentication endpoints in `Features/Authentication/` (vertical slice pattern)
 - All controllers require authorization by default: `app.MapControllers().RequireAuthorization()`
+- Bearer tokens returned via `SignInManager` with `IdentityConstants.BearerScheme`
+
+**Admin User**: Database seeder creates admin user on first startup (`DatabaseSeeder.cs`):
+- Email: `admin@jasperdocs.local`
+- Password: Randomly generated, logged to console (check WebApi logs in Aspire Dashboard)
 
 ### Frontend Architecture
 
@@ -140,10 +147,10 @@ Entity configurations are separate from entities and auto-discovered:
 - Token storage: `localStorage.authToken` (auto-injected by axios)
 - Protected routes redirect to `/login` if unauthenticated
 
-**Routing**: React Router v6
+**Routing**: TanStack Router with file-based routing
 - `/` - Home page
 - `/documents` - Protected documents page
-- `/login` - Authentication page (mock implementation, TODO: integrate with `/login` API)
+- `/login` - Authentication page (integrated with `/api/login` endpoint)
 
 **Structure**:
 ```
@@ -156,6 +163,8 @@ src/
 
 **Development mode** (default when running AppHost):
 - Vite dev server runs separately via Aspire on port 5173 with HMR
+- Vite proxy forwards `/api/*` requests to WebApi (configured in vite.config.ts)
+- Aspire injects `VITE_API_URL` env var with WebApi endpoint
 - CORS enabled on WebApi for localhost:5173
 - Static file serving disabled in WebApi
 
@@ -203,6 +212,9 @@ await mutation.mutateAsync({ data: {...} });
 4. Add controller with endpoints (convert domain results to HTTP responses)
 5. Add `[ProducesResponseType<T>]` attributes for OpenAPI documentation
 6. Register handler in `Program.cs`
+7. Rebuild WebApi and regenerate API client: `dotnet build JasperDocs.WebApi/JasperDocs.WebApi.csproj && cd JasperDocs.WebApp && npm run api:generate`
+
+**Note**: All endpoints automatically prefixed with `/api` via `RoutePrefixConvention`. Controllers don't need to include `/api` in their routes.
 
 ### Adding a New Entity
 
@@ -211,9 +223,28 @@ await mutation.mutateAsync({ data: {...} });
 3. Create configuration class in `Infrastructure/EntityConfigurations/` (if needed for custom mappings)
 4. Run `dotnet ef migrations add <MigrationName> --project JasperDocs.WebApi`
 
-### Aspire Service Defaults
+### Aspire Service Discovery and Integration
 
-The `JasperDocs.ServiceDefaults` project provides common Aspire infrastructure:
+**AppHost Configuration** (`JasperDocs.AppHost/AppHost.cs`):
+- WebApp references WebApi via `.WithReference(webApi)`
+- Aspire injects `VITE_API_URL` environment variable pointing to WebApi
+- WebApp waits for WebApi to start via `.WaitFor(webApi)`
+
+**Vite Proxy** (`JasperDocs.WebApp/vite.config.ts`):
+```typescript
+proxy: {
+  '/api': {
+    target: process.env.VITE_API_URL || 'http://localhost:5000',
+    changeOrigin: true,
+    secure: false,
+  }
+}
+```
+- Development: Proxies `/api/*` to WebApi service URL from Aspire
+- Production: Not used (same-origin requests to WebApi serving static files)
+- Standalone: Falls back to `localhost:5000` when `VITE_API_URL` not set
+
+**Service Defaults** (`JasperDocs.ServiceDefaults`):
 - OpenTelemetry (metrics, tracing, logging)
 - Health checks at `/health` and `/alive` (development only)
 - Service discovery

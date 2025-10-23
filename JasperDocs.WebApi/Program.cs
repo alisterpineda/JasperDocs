@@ -17,7 +17,10 @@ builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase");
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
 builder.Services.AddScoped<IRequestHandler<LoginRequest, Microsoft.AspNetCore.Identity.SignInResult>, LoginHandler>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.UseGeneralRoutePrefix("api");
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options =>
 {
@@ -31,7 +34,7 @@ builder.Services.AddOpenApi(options =>
             Type = SecuritySchemeType.Http,
             Scheme = "bearer",
             BearerFormat = "JWT",
-            Description = "Enter the Bearer token obtained from the /login endpoint"
+            Description = "Enter the Bearer token obtained from the /api/login endpoint"
         };
 
         return Task.CompletedTask;

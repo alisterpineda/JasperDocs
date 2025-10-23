@@ -35,7 +35,7 @@ export const getWeatherForecast = (
       
       
       return customAxiosInstance<WeatherForecast[]>(
-      {url: `/WeatherForecast`, method: 'GET', signal
+      {url: `/api/WeatherForecast`, method: 'GET', signal
     },
       );
     }
@@ -45,7 +45,7 @@ export const getWeatherForecast = (
 
 export const getGetWeatherForecastQueryKey = () => {
     return [
-    `/WeatherForecast`
+    `/api/WeatherForecast`
     ] as const;
     }
 

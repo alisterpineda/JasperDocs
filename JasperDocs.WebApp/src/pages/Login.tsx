@@ -11,37 +11,33 @@ import {
   Text,
 } from '@mantine/core';
 import { useAuth } from '../contexts/AuthContext';
+import { usePostApiLogin } from '../api/generated/authentication/authentication';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { mutateAsync: loginMutation, isPending } = usePostApiLogin();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
     try {
-      // TODO: Import and use the actual postLogin function from the generated API client
-      // For now this is a mock implementation until the login endpoint returns proper tokens
+      const response = await loginMutation({
+        data: {
+          email,
+          password
+        }
+      });
 
-      // Example of how to integrate:
-      // import { postLogin } from '../api/generated/authentication/authentication';
-      // const response = await postLogin({ email, password });
-      // login(response.accessToken, email);
-
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const mockToken = 'mock-jwt-token';
-      login(mockToken, email);
+      login(response.accessToken, email);
       navigate({ to: '/' });
-    } catch (err) {
-      setError('Login failed. Please try again.');
-    } finally {
-      setLoading(false);
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.detail || 'Login failed. Please check your credentials.';
+      setError(errorMessage);
     }
   };
 
@@ -70,7 +66,7 @@ export function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
             {error && <Text c="red" size="sm">{error}</Text>}
-            <Button type="submit" fullWidth loading={loading}>
+            <Button type="submit" fullWidth loading={isPending}>
               Sign in
             </Button>
           </Stack>
