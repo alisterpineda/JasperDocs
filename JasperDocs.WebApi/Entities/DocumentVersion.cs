@@ -6,6 +6,7 @@ public class DocumentVersion
     public Guid DocumentId { get; set; }
     public int VersionNumber { get; set; }
     public string? Description { get; set; }
+    public required string StoragePath { get; set; }
     public DateTime CreatedAt { get; init; }
     public Guid? CreatedByUserId { get; init; }
 

@@ -8,13 +8,15 @@ namespace JasperDocs.WebApi.Features.Documents;
 public class DocumentsController : ControllerBase
 {
     [HttpPost()]
-    public Task CreateDocumentAsync([FromServices] IRequestHandler<CreateDocument> requestHandler, [FromBody] CreateDocument request, CancellationToken ct = default)
+    [Consumes("multipart/form-data")]
+    public Task CreateDocumentAsync([FromServices] IRequestHandler<CreateDocument> requestHandler, [FromForm] CreateDocument request, CancellationToken ct = default)
     {
         return requestHandler.HandleAsync(request, ct);
     }
 
     [HttpPost("versions")]
-    public Task CreateDocumentVersionAsync([FromServices] IRequestHandler<CreateDocumentVersion> requestHandler, [FromBody] CreateDocumentVersion request, CancellationToken ct = default)
+    [Consumes("multipart/form-data")]
+    public Task CreateDocumentVersionAsync([FromServices] IRequestHandler<CreateDocumentVersion> requestHandler, [FromForm] CreateDocumentVersion request, CancellationToken ct = default)
     {
         return requestHandler.HandleAsync(request, ct);
     }

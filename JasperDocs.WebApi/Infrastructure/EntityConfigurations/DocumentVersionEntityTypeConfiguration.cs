@@ -21,6 +21,10 @@ public class DocumentVersionEntityTypeConfiguration : IEntityTypeConfiguration<D
             .IsRequired();
 
         builder
+            .Property(e => e.StoragePath)
+            .IsRequired();
+
+        builder
             .HasOne(e => e.Document)
             .WithMany(d => d.Versions)
             .HasForeignKey(e => e.DocumentId)

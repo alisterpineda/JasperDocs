@@ -15,8 +15,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  CreateDocument,
-  CreateDocumentVersion
+  PostApiDocumentsBody,
+  PostApiDocumentsVersionsBody
 } from '../api.schemas';
 
 import { customAxiosInstance } from '../../axios-instance';
@@ -25,15 +25,19 @@ import { customAxiosInstance } from '../../axios-instance';
 
 
 export const postApiDocuments = (
-    createDocument: CreateDocument,
+    postApiDocumentsBody: PostApiDocumentsBody,
  signal?: AbortSignal
 ) => {
       
-      
+      const formData = new FormData();
+if(postApiDocumentsBody.File !== undefined) {
+ formData.append(`File`, postApiDocumentsBody.File)
+ }
+
       return customAxiosInstance<void>(
       {url: `/api/Documents`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createDocument, signal
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
     },
       );
     }
@@ -41,8 +45,8 @@ export const postApiDocuments = (
 
 
 export const getPostApiDocumentsMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocuments>>, TError,{data: CreateDocument}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof postApiDocuments>>, TError,{data: CreateDocument}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocuments>>, TError,{data: PostApiDocumentsBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postApiDocuments>>, TError,{data: PostApiDocumentsBody}, TContext> => {
 
 const mutationKey = ['postApiDocuments'];
 const {mutation: mutationOptions} = options ?
@@ -54,7 +58,7 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiDocuments>>, {data: CreateDocument}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiDocuments>>, {data: PostApiDocumentsBody}> = (props) => {
           const {data} = props ?? {};
 
           return  postApiDocuments(data,)
@@ -66,15 +70,15 @@ const {mutation: mutationOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PostApiDocumentsMutationResult = NonNullable<Awaited<ReturnType<typeof postApiDocuments>>>
-    export type PostApiDocumentsMutationBody = CreateDocument
+    export type PostApiDocumentsMutationBody = PostApiDocumentsBody
     export type PostApiDocumentsMutationError = unknown
 
     export const usePostApiDocuments = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocuments>>, TError,{data: CreateDocument}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocuments>>, TError,{data: PostApiDocumentsBody}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postApiDocuments>>,
         TError,
-        {data: CreateDocument},
+        {data: PostApiDocumentsBody},
         TContext
       > => {
 
@@ -83,15 +87,25 @@ const {mutation: mutationOptions} = options ?
       return useMutation(mutationOptions, queryClient);
     }
     export const postApiDocumentsVersions = (
-    createDocumentVersion: CreateDocumentVersion,
+    postApiDocumentsVersionsBody: PostApiDocumentsVersionsBody,
  signal?: AbortSignal
 ) => {
       
-      
+      const formData = new FormData();
+if(postApiDocumentsVersionsBody.DocumentId !== undefined) {
+ formData.append(`DocumentId`, postApiDocumentsVersionsBody.DocumentId)
+ }
+if(postApiDocumentsVersionsBody.Description !== undefined) {
+ formData.append(`Description`, postApiDocumentsVersionsBody.Description)
+ }
+if(postApiDocumentsVersionsBody.File !== undefined) {
+ formData.append(`File`, postApiDocumentsVersionsBody.File)
+ }
+
       return customAxiosInstance<void>(
       {url: `/api/Documents/versions`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createDocumentVersion, signal
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
     },
       );
     }
@@ -99,8 +113,8 @@ const {mutation: mutationOptions} = options ?
 
 
 export const getPostApiDocumentsVersionsMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocumentsVersions>>, TError,{data: CreateDocumentVersion}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof postApiDocumentsVersions>>, TError,{data: CreateDocumentVersion}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocumentsVersions>>, TError,{data: PostApiDocumentsVersionsBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postApiDocumentsVersions>>, TError,{data: PostApiDocumentsVersionsBody}, TContext> => {
 
 const mutationKey = ['postApiDocumentsVersions'];
 const {mutation: mutationOptions} = options ?
@@ -112,7 +126,7 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiDocumentsVersions>>, {data: CreateDocumentVersion}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiDocumentsVersions>>, {data: PostApiDocumentsVersionsBody}> = (props) => {
           const {data} = props ?? {};
 
           return  postApiDocumentsVersions(data,)
@@ -124,15 +138,15 @@ const {mutation: mutationOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PostApiDocumentsVersionsMutationResult = NonNullable<Awaited<ReturnType<typeof postApiDocumentsVersions>>>
-    export type PostApiDocumentsVersionsMutationBody = CreateDocumentVersion
+    export type PostApiDocumentsVersionsMutationBody = PostApiDocumentsVersionsBody
     export type PostApiDocumentsVersionsMutationError = unknown
 
     export const usePostApiDocumentsVersions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocumentsVersions>>, TError,{data: CreateDocumentVersion}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiDocumentsVersions>>, TError,{data: PostApiDocumentsVersionsBody}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postApiDocumentsVersions>>,
         TError,
-        {data: CreateDocumentVersion},
+        {data: PostApiDocumentsVersionsBody},
         TContext
       > => {
 

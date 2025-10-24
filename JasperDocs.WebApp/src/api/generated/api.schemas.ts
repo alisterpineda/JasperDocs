@@ -11,17 +11,7 @@ export interface AccessTokenResponse {
   refreshToken: string;
 }
 
-export interface CreateDocument {
-  title: string;
-  /** @nullable */
-  description?: string | null;
-}
-
-export interface CreateDocumentVersion {
-  documentId: string;
-  /** @nullable */
-  description?: string | null;
-}
+export type IFormFile = Blob;
 
 export interface LoginRequest {
   email: string;
@@ -52,4 +42,14 @@ export interface WeatherForecast {
   /** @nullable */
   summary?: string | null;
 }
+
+export type PostApiDocumentsBody = {
+  File?: IFormFile;
+};
+
+export type PostApiDocumentsVersionsBody = {
+  DocumentId?: string;
+  Description?: string;
+  File?: IFormFile;
+};
 

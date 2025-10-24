@@ -19,6 +19,8 @@ export default defineConfig({
         target: process.env.VITE_API_URL || 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
+        followRedirects: false, // Don't follow redirects, go straight to HTTPS
+        rewrite: (path) => path, // Keep the path as-is
         configure: (proxy, options) => {
           console.log('[Vite Proxy] Proxying /api requests to:', options.target);
         },

@@ -85,15 +85,22 @@ builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandle
 ### Domain Model: Documents and Versioning
 
 **Document** is an aggregate root with **DocumentVersion** child entities:
-- Document: Title, Description (nullable), CreatedByUserId, Versions collection
-- DocumentVersion: DocumentId, VersionNumber (int), Description (nullable), CreatedByUserId, CreatedAt
+- Document: Title (from uploaded filename), Description (nullable), CreatedByUserId, Versions collection
+- DocumentVersion: DocumentId, VersionNumber (int), Description (nullable), **StoragePath (required)**, CreatedByUserId, CreatedAt
 - Unique constraint: (DocumentId, VersionNumber)
 - Cascade delete: Deleting Document removes all Versions
 
+**File Upload & Storage**:
+- Every DocumentVersion requires a file upload (StoragePath is required)
+- Files stored at: `{DataDirectoryPath}/documents/{documentId}/{versionId}/{filename}`
+- StoragePath contains relative path from DataDirectoryPath for portability
+- Document.Title is set to uploaded file's original filename
+
 **Versioning Behavior**:
-- Creating a Document auto-creates Version 1 (see `CreateDocumentHandler`)
+- Creating a Document requires file upload via multipart/form-data
+- Auto-creates Version 1 with uploaded file (see `CreateDocumentHandler`)
 - Version numbers auto-increment (finds max + 1)
-- Create new version: POST `/api/documents/versions` with `{ documentId, description? }`
+- Create new version: POST `/api/documents/versions` with file upload
 
 **DDD Pattern**: All Document-related endpoints under `DocumentsController` since Document is the aggregate root.
 
@@ -107,10 +114,22 @@ IRequestHandler<TRequest>             // Returns Task (no response data)
 
 **Controller Pattern** - Inject handlers per endpoint via `[FromServices]`:
 ```csharp
+// JSON body
 [HttpPost]
 public Task CreateAsync(
     [FromServices] IRequestHandler<CreateDocument> handler,
     [FromBody] CreateDocument request,
+    CancellationToken ct = default)
+{
+    return handler.HandleAsync(request, ct);
+}
+
+// File upload (multipart/form-data)
+[HttpPost]
+[Consumes("multipart/form-data")]
+public Task UploadAsync(
+    [FromServices] IRequestHandler<CreateDocument> handler,
+    [FromForm] CreateDocument request,
     CancellationToken ct = default)
 {
     return handler.HandleAsync(request, ct);
@@ -150,16 +169,21 @@ Entity configurations are separate from entities and auto-discovered:
 ### Configuration: Options Pattern
 
 **StorageOptions** (`Core/StorageOptions.cs`): Configures file storage location
-- `DataDirectoryPath`: Root directory for document uploads
+- `DataDirectoryPath`: Root directory for document uploads (must be absolute path)
 - Configured via `DATA_DIR_PATH` environment variable
 - Mapped to `Storage:DataDirectoryPath` config key using in-memory provider
 - Injected via `IOptionsMonitor<StorageOptions>` for dynamic configuration updates
+- **Validation**: Handlers validate path is non-empty and absolute before use
 
 **Usage**:
 ```csharp
 public class MyHandler(IOptionsMonitor<StorageOptions> storageOptions)
 {
     var path = storageOptions.CurrentValue.DataDirectoryPath;
+    if (string.IsNullOrWhiteSpace(path))
+        throw new InvalidOperationException("DataDirectoryPath is not configured.");
+    if (!Path.IsPathFullyQualified(path))
+        throw new InvalidOperationException($"DataDirectoryPath must be absolute. Current: {path}");
 }
 ```
 
@@ -219,9 +243,10 @@ cd JasperDocs.WebApp && npm run api:generate
 
 **Usage**:
 ```typescript
-import { usePostDocuments } from './api/generated/documents/documents';
-const mutation = usePostDocuments();
-await mutation.mutateAsync({ data: {...} });
+// Generated hooks use 'Api' prefix: usePostApiDocuments, useGetApiDocuments, etc.
+import { usePostApiDocuments } from './api/generated/documents/documents';
+const mutation = usePostApiDocuments();
+await mutation.mutateAsync({ data: { File: file } }); // For file uploads
 ```
 
 **Auth**: `localStorage.authToken` auto-injected via axios interceptor. See `src/api/axios-instance.ts` for 401 handling.
@@ -233,6 +258,20 @@ await mutation.mutateAsync({ data: {...} });
 - Connection string configured in AppHost: `builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase")`
 - Migrations auto-applied on startup (see TODO in Program.cs about safer migration approach)
 - PgWeb included for database management UI during development
+
+**Transactions with Npgsql**: Use execution strategy wrapper for manual transactions:
+```csharp
+var strategy = _context.Database.CreateExecutionStrategy();
+await strategy.ExecuteAsync(async () =>
+{
+    await using var transaction = await _context.Database.BeginTransactionAsync(ct);
+    try {
+        // DB operations and file I/O
+        await transaction.CommitAsync(ct);
+    }
+    catch { throw; } // Auto-rollback on dispose
+});
+```
 
 ## Development Notes
 
@@ -259,7 +298,7 @@ await mutation.mutateAsync({ data: {...} });
 
 **AppHost Configuration** (`JasperDocs.AppHost/AppHost.cs`):
 - WebApp references WebApi via `.WithReference(webApi)`
-- Aspire injects `VITE_API_URL` environment variable pointing to WebApi
+- Aspire injects `VITE_API_URL` with **HTTPS** endpoint: `webApi.GetEndpoint("https")`
 - WebApp waits for WebApi to start via `.WaitFor(webApi)`
 
 **Vite Proxy** (`JasperDocs.WebApp/vite.config.ts`):

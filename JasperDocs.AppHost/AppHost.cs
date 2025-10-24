@@ -16,7 +16,7 @@ if (builder.Environment.IsDevelopment())
         .WithHttpEndpoint(port: 5173, isProxied: false)
         .WithExternalHttpEndpoints()
         .WithReference(webApi)
-        .WithEnvironment("VITE_API_URL", webApi.GetEndpoint("http"))
+        .WithEnvironment("VITE_API_URL", webApi.GetEndpoint("https"))
         .WaitFor(webApi);
 }
 
