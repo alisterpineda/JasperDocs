@@ -1,11 +1,11 @@
 .header {
   height: 60px;
-  border-bottom: 1px solid var(--mantine-color-gray-3);
-  background-color: var(--mantine-color-white);
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
+  background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-7));
 }
 
 .logo {
-  color: var(--mantine-color-blue-6);
+  color: light-dark(var(--mantine-color-blue-6), var(--mantine-color-blue-4));
 }
 
 .userButton {
@@ -15,20 +15,5 @@
 }
 
 .userButton:hover {
-  background-color: var(--mantine-color-gray-1);
-}
-
-@media (prefers-color-scheme: dark) {
-  .header {
-    border-bottom-color: var(--mantine-color-dark-5);
-    background-color: var(--mantine-color-dark-7);
-  }
-
-  .logo {
-    color: var(--mantine-color-blue-4);
-  }
-
-  .userButton:hover {
-    background-color: var(--mantine-color-dark-6);
-  }
+  background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6));
 }

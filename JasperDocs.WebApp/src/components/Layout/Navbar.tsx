@@ -1,6 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
-import { Group, Button, Menu, Avatar, Text, UnstyledButton, Burger } from '@mantine/core';
-import { IconLogout, IconUser } from '@tabler/icons-react';
+import { Group, Button, Menu, Avatar, Text, UnstyledButton, Burger, ActionIcon, Tooltip } from '@mantine/core';
+import { IconLogout, IconUser, IconSun, IconMoon, IconSunMoon } from '@tabler/icons-react';
+import { useMantineColorScheme } from '@mantine/core';
 import { useAuth } from '../../contexts/AuthContext';
 import classes from './Navbar.module.css';
 
@@ -12,10 +13,41 @@ interface NavbarProps {
 export function Navbar({ opened, toggle }: NavbarProps) {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   const handleLogout = () => {
     logout();
     navigate({ to: '/login' });
+  };
+
+  const cycleColorScheme = () => {
+    if (colorScheme === 'light') {
+      setColorScheme('dark');
+    } else if (colorScheme === 'dark') {
+      setColorScheme('auto');
+    } else {
+      setColorScheme('light');
+    }
+  };
+
+  const getThemeIcon = () => {
+    if (colorScheme === 'light') {
+      return <IconSun size={20} stroke={1.5} />;
+    } else if (colorScheme === 'dark') {
+      return <IconMoon size={20} stroke={1.5} />;
+    } else {
+      return <IconSunMoon size={20} stroke={1.5} />;
+    }
+  };
+
+  const getThemeLabel = () => {
+    if (colorScheme === 'light') {
+      return 'Switch to dark mode';
+    } else if (colorScheme === 'dark') {
+      return 'Switch to auto mode';
+    } else {
+      return 'Switch to light mode';
+    }
   };
 
   return (
@@ -28,7 +60,19 @@ export function Navbar({ opened, toggle }: NavbarProps) {
           </Text>
         </Group>
 
-        {isAuthenticated ? (
+        <Group gap="sm">
+          <Tooltip label={getThemeLabel()}>
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              onClick={cycleColorScheme}
+              aria-label="Cycle color scheme"
+            >
+              {getThemeIcon()}
+            </ActionIcon>
+          </Tooltip>
+
+          {isAuthenticated ? (
           <Menu shadow="md" width={200}>
             <Menu.Target>
               <UnstyledButton className={classes.userButton}>
@@ -58,11 +102,12 @@ export function Navbar({ opened, toggle }: NavbarProps) {
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
-        ) : (
-          <Button onClick={() => navigate({ to: '/login' })}>
-            Sign In
-          </Button>
-        )}
+          ) : (
+            <Button onClick={() => navigate({ to: '/login' })}>
+              Sign In
+            </Button>
+          )}
+        </Group>
       </Group>
     </header>
   );
