@@ -2,7 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { Group, Button, Menu, Avatar, Text, UnstyledButton, Burger, ActionIcon, Tooltip } from '@mantine/core';
 import { IconLogout, IconUser, IconSun, IconMoon, IconSunMoon } from '@tabler/icons-react';
 import { useMantineColorScheme } from '@mantine/core';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import classes from './Navbar.module.css';
 
 interface NavbarProps {
@@ -15,8 +15,8 @@ export function Navbar({ opened, toggle }: NavbarProps) {
   const navigate = useNavigate();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate({ to: '/login' });
   };
 

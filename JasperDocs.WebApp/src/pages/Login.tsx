@@ -10,7 +10,7 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { usePostApiLogin } from '../api/generated/authentication/authentication';
 
 export function Login() {
@@ -33,10 +33,11 @@ export function Login() {
         }
       });
 
-      login(response.accessToken, email);
+      // Pass the entire token response to login for proper token management
+      login(response, email);
       navigate({ to: '/' });
-    } catch (err: any) {
-      const errorMessage = err?.response?.data?.detail || 'Login failed. Please check your credentials.';
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Login failed. Please check your credentials.';
       setError(errorMessage);
     }
   };

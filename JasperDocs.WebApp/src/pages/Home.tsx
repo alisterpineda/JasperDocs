@@ -1,5 +1,5 @@
 import { Title, Text, Container, Paper, Stack } from '@mantine/core';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 export function Home() {
   const { user, isAuthenticated } = useAuth();

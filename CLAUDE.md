@@ -158,9 +158,13 @@ Entity configurations are separate from entities and auto-discovered:
 
 - Uses ASP.NET Core Identity with `ApplicationUser : IdentityUser<Guid>` (Guid primary keys)
 - Configured with `AddIdentityApiEndpoints<ApplicationUser>()` for bearer token support
-- Custom authentication endpoints in `Features/Authentication/` (vertical slice pattern)
+- Custom authentication endpoints in `Features/Authentication/` (vertical slice pattern):
+  - `POST /api/login` - Returns `AccessTokenResponse` (access token, refresh token, expiresIn)
+  - `POST /api/refresh` - Refreshes tokens using refresh token
+  - `POST /api/logout` - Signs out user (requires auth)
 - All controllers require authorization by default: `app.MapControllers().RequireAuthorization()`
 - Bearer tokens returned via `SignInManager` with `IdentityConstants.BearerScheme`
+- Tokens are ASP.NET Core Identity proprietary format (not JWTs)
 
 **Admin User**: Database seeder creates admin user on first startup (`DatabaseSeeder.cs`):
 - Email: `admin@jasperdocs.local`
@@ -198,9 +202,12 @@ public class MyHandler(IOptionsMonitor<StorageOptions> storageOptions)
 - Collapsible sidebar (250px, collapses on mobile)
 - Login page bypasses layout shell
 
-**Authentication**: Context-based (`contexts/AuthContext.tsx`)
-- State: `isAuthenticated`, `user`, `login()`, `logout()`
-- Token storage: `localStorage.authToken` (auto-injected by axios)
+**Authentication**: Context-based (`contexts/AuthContext.tsx`, `hooks/useAuth.ts`)
+- State: `isAuthenticated`, `user`, `login(tokenResponse, email)`, `logout()`, `refreshTokens()`
+- Token storage: `localStorage.authToken` (access), `localStorage.refreshToken` (refresh)
+- Automatic token refresh: 5 minutes before expiry via `services/tokenRefresh.ts`
+- Multi-tab sync: Storage events keep auth state synchronized across tabs
+- Axios interceptors: Auto-refresh on 401, retry failed requests with new token
 - Protected routes redirect to `/login` if unauthenticated
 
 **Routing**: TanStack Router with file-based routing
@@ -213,7 +220,9 @@ public class MyHandler(IOptionsMonitor<StorageOptions> storageOptions)
 src/
   components/Layout/  # AppLayout, Navbar, Sidebar
   pages/              # Home, Documents, Login
-  contexts/           # AuthContext
+  contexts/           # AuthContext (provider), auth-context (context definition)
+  hooks/              # useAuth
+  services/           # tokenRefresh (singleton for token management)
   api/                # Generated clients, axios config
 ```
 
@@ -243,13 +252,19 @@ cd JasperDocs.WebApp && npm run api:generate
 
 **Usage**:
 ```typescript
-// Generated hooks use 'Api' prefix: usePostApiDocuments, useGetApiDocuments, etc.
+// Generated hooks: usePostApiLogin, usePostApiRefresh, usePostApiLogout, usePostApiDocuments, etc.
 import { usePostApiDocuments } from './api/generated/documents/documents';
-const mutation = usePostApiDocuments();
-await mutation.mutateAsync({ data: { File: file } }); // For file uploads
+import { usePostApiLogin } from './api/generated/authentication/authentication';
+
+const loginMutation = usePostApiLogin();
+const response = await loginMutation.mutateAsync({ data: { email, password } });
+// Response: { accessToken, refreshToken, tokenType, expiresIn }
+
+const docMutation = usePostApiDocuments();
+await docMutation.mutateAsync({ data: { File: file } }); // For file uploads
 ```
 
-**Auth**: `localStorage.authToken` auto-injected via axios interceptor. See `src/api/axios-instance.ts` for 401 handling.
+**Auth**: Tokens auto-injected via axios interceptor. Automatic refresh on 401 errors.
 **Config**: `orval.config.ts`, `src/main.tsx` (QueryClientProvider, 5min cache)
 
 ### Database

@@ -22,6 +22,8 @@ export interface LoginRequest {
   twoFactorRecoveryCode?: string | null;
 }
 
+export interface LogoutRequest { [key: string]: unknown }
+
 export interface ProblemDetails {
   /** @nullable */
   type?: string | null;
@@ -33,6 +35,10 @@ export interface ProblemDetails {
   detail?: string | null;
   /** @nullable */
   instance?: string | null;
+}
+
+export interface RefreshRequest {
+  refreshToken: string;
 }
 
 export interface WeatherForecast {

@@ -31,4 +31,33 @@ public class AuthenticationController : ControllerBase
         // Return Empty - SignInManager automatically writes the bearer token response
         return TypedResults.Empty;
     }
+
+    [AllowAnonymous]
+    [HttpPost("refresh")]
+    [ProducesResponseType<AccessTokenResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IResult> RefreshAsync(
+        [FromServices] IRequestHandler<RefreshRequest, IResult> handler,
+        [FromBody] RefreshRequest request,
+        CancellationToken ct = default)
+    {
+        return await handler.HandleAsync(request, ct);
+    }
+
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IResult> LogoutAsync(
+        [FromServices] IRequestHandler<LogoutRequest> handler,
+        [FromBody] LogoutRequest request,
+        CancellationToken ct = default)
+    {
+        if (request == null)
+        {
+            return TypedResults.Unauthorized();
+        }
+
+        await handler.HandleAsync(request, ct);
+        return TypedResults.Ok();
+    }
 }
