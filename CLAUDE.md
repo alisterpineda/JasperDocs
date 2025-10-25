@@ -181,16 +181,18 @@ Entity configurations are separate from entities and auto-discovered:
 - Uses ASP.NET Core Identity with `ApplicationUser : IdentityUser<Guid>` (Guid primary keys)
 - Configured with `AddIdentityApiEndpoints<ApplicationUser>()` for bearer token support
 - Custom authentication endpoints in `Features/Authentication/` (vertical slice pattern):
-  - `POST /api/login` - Returns `AccessTokenResponse` (access token, refresh token, expiresIn)
+  - `POST /api/login` - Accepts `username` and `password`, returns `AccessTokenResponse` (access token, refresh token, expiresIn)
   - `POST /api/refresh` - Refreshes tokens using refresh token
   - `POST /api/logout` - Signs out user (requires auth)
 - All controllers require authorization by default: `app.MapControllers().RequireAuthorization()`
 - Bearer tokens returned via `SignInManager` with `IdentityConstants.BearerScheme`
 - Tokens are ASP.NET Core Identity proprietary format (not JWTs)
 
-**Admin User**: Database seeder creates admin user on first startup (`DatabaseSeeder.cs`):
-- Email: `admin@jasperdocs.local`
-- Password: Randomly generated, logged to console (check WebApi logs in Aspire Dashboard)
+**Admin User**: Database seeder creates admin user on first startup if configured (`DatabaseSeeder.cs`):
+- Requires `INITIAL_ADMIN_USERNAME` and `INITIAL_ADMIN_PASSWORD` environment variables
+- Only runs when database has zero users
+- Created user has `Email: null`, `EmailConfirmed: false`
+- Configure via AppHost external parameters: `initial-admin-username` and `initial-admin-password` (secret)
 
 ### Configuration: Options Pattern
 
@@ -225,8 +227,8 @@ public class MyHandler(IOptionsMonitor<StorageOptions> storageOptions)
 - Login page bypasses layout shell
 
 **Authentication**: Context-based (`contexts/AuthContext.tsx`, `hooks/useAuth.ts`)
-- State: `isAuthenticated`, `user`, `login(tokenResponse, email)`, `logout()`, `refreshTokens()`
-- Token storage: `localStorage.authToken` (access), `localStorage.refreshToken` (refresh)
+- State: `isAuthenticated`, `user`, `login(tokenResponse, username)`, `logout()`, `refreshTokens()`
+- Token storage: `localStorage.authToken` (access), `localStorage.refreshToken` (refresh), `localStorage.username`
 - Automatic token refresh: 5 minutes before expiry via `services/tokenRefresh.ts`
 - Multi-tab sync: Storage events keep auth state synchronized across tabs
 - Axios interceptors: Auto-refresh on 401, retry failed requests with new token
@@ -345,6 +347,7 @@ await strategy.ExecuteAsync(async () =>
 ### Aspire Service Discovery and Integration
 
 **AppHost Configuration** (`JasperDocs.AppHost/AppHost.cs`):
+- External parameters: `data-dir-path`, `initial-admin-username`, `initial-admin-password` (secret)
 - WebApp references WebApi via `.WithReference(webApi)`
 - Aspire injects `VITE_API_URL` with **HTTPS** endpoint: `webApi.GetEndpoint("https")`
 - WebApp waits for WebApi to start via `.WaitFor(webApi)`

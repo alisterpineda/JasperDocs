@@ -22,7 +22,7 @@ export interface DocumentListItemDto {
 export type IFormFile = Blob;
 
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
   /** @nullable */
   twoFactorCode?: string | null;

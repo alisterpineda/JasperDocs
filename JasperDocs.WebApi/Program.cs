@@ -124,8 +124,15 @@ using (var scope = app.Services.CreateScope())
         await db.Database.MigrateAsync();
         logger.LogInformation("Database migrations completed successfully");
 
-        await DatabaseSeeder.SeedAsync(app.Services);
-        logger.LogInformation("Database seeding completed");
+        // Only seed admin user if both username and password are provided
+        var initialAdminUsername = configuration["INITIAL_ADMIN_USERNAME"];
+        var initialAdminPassword = configuration["INITIAL_ADMIN_PASSWORD"];
+
+        if (!string.IsNullOrEmpty(initialAdminUsername) && !string.IsNullOrEmpty(initialAdminPassword))
+        {
+            await DatabaseSeeder.SeedAsync(app.Services, initialAdminUsername, initialAdminPassword);
+            logger.LogInformation("Database seeding completed");
+        }
     }
     else
     {

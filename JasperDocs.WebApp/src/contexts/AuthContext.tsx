@@ -9,16 +9,16 @@ const AUTH_STORAGE_KEY = 'auth:state';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<{ email?: string } | null>(null);
+  const [user, setUser] = useState<{ username?: string } | null>(null);
 
   // Function to update auth state and notify other tabs
-  const updateAuthState = useCallback((authenticated: boolean, email?: string) => {
+  const updateAuthState = useCallback((authenticated: boolean, username?: string) => {
     setIsAuthenticated(authenticated);
-    setUser(authenticated ? { email } : null);
+    setUser(authenticated ? { username } : null);
 
     // Broadcast state change to other tabs via localStorage event
     if (authenticated) {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ authenticated: true, email }));
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ authenticated: true, username }));
     } else {
       localStorage.removeItem(AUTH_STORAGE_KEY);
     }
@@ -36,14 +36,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Login function
-  const login = useCallback((tokenResponse: AccessTokenResponse, email?: string) => {
+  const login = useCallback((tokenResponse: AccessTokenResponse, username?: string) => {
     localStorage.setItem('authToken', tokenResponse.accessToken);
     localStorage.setItem('refreshToken', tokenResponse.refreshToken);
-    if (email) {
-      localStorage.setItem('userEmail', email);
+    if (username) {
+      localStorage.setItem('username', username);
     }
 
-    updateAuthState(true, email);
+    updateAuthState(true, username);
 
     // Schedule proactive refresh 5 minutes before expiry
     tokenRefreshService.scheduleRefresh(tokenResponse.expiresIn, (newTokenResponse) => {
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Clear all auth data
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userEmail');
+    localStorage.removeItem('username');
 
     // Clear token refresh service state
     tokenRefreshService.clear();
@@ -77,11 +77,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     const refreshToken = localStorage.getItem('refreshToken');
-    const email = localStorage.getItem('userEmail');
+    const username = localStorage.getItem('username');
 
     if (token && refreshToken) {
       setIsAuthenticated(true);
-      setUser({ email: email || undefined });
+      setUser({ username: username || undefined });
 
       // Note: We can't schedule refresh here without knowing the expiry time
       // The refresh will be handled by the axios interceptor if needed
@@ -94,9 +94,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Handle auth state changes
       if (e.key === AUTH_STORAGE_KEY) {
         if (e.newValue) {
-          const { authenticated, email } = JSON.parse(e.newValue);
+          const { authenticated, username } = JSON.parse(e.newValue);
           setIsAuthenticated(authenticated);
-          setUser(authenticated ? { email } : null);
+          setUser(authenticated ? { username } : null);
         } else {
           // Logout in another tab
           setIsAuthenticated(false);

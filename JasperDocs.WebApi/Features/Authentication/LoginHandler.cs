@@ -19,7 +19,7 @@ public class LoginHandler : IRequestHandler<LoginRequest, SignInResult>
         _signInManager.AuthenticationScheme = IdentityConstants.BearerScheme;
 
         var result = await _signInManager.PasswordSignInAsync(
-            request.Email,
+            request.Username,
             request.Password,
             isPersistent: false,
             lockoutOnFailure: true);

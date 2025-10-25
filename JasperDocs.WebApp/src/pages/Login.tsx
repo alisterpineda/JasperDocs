@@ -14,7 +14,7 @@ import { useAuth } from '../hooks/useAuth';
 import { usePostApiLogin } from '../api/generated/authentication/authentication';
 
 export function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth();
@@ -28,13 +28,13 @@ export function Login() {
     try {
       const response = await loginMutation({
         data: {
-          email,
+          username,
           password
         }
       });
 
       // Pass the entire token response to login for proper token management
-      login(response, email);
+      login(response, username);
       navigate({ to: '/' });
     } catch (err: unknown) {
       const errorMessage = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Login failed. Please check your credentials.';
@@ -53,11 +53,11 @@ export function Login() {
         <form onSubmit={handleSubmit}>
           <Stack gap="md">
             <TextInput
-              label="Email"
-              placeholder="you@example.com"
+              label="Username"
+              placeholder="Enter your username"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <PasswordInput
               label="Password"

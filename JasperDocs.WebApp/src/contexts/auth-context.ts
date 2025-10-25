@@ -3,8 +3,8 @@ import type { AccessTokenResponse } from '../api/generated/api.schemas';
 
 export interface AuthContextType {
   isAuthenticated: boolean;
-  user: { email?: string } | null;
-  login: (tokenResponse: AccessTokenResponse, email?: string) => void;
+  user: { username?: string } | null;
+  login: (tokenResponse: AccessTokenResponse, username?: string) => void;
   logout: () => Promise<void>;
   refreshTokens: (tokenResponse: AccessTokenResponse) => void;
 }
