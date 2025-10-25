@@ -102,6 +102,11 @@ builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandle
 - Version numbers auto-increment (finds max + 1)
 - Create new version: POST `/api/documents/versions` with file upload
 
+**Endpoints**:
+- `GET /api/documents` - List documents with pagination (pageNumber, pageSize query params)
+- `POST /api/documents` - Create document with file upload
+- `POST /api/documents/versions` - Create new version with file upload
+
 **DDD Pattern**: All Document-related endpoints under `DocumentsController` since Document is the aggregate root.
 
 ### Request/Response Flow
@@ -145,6 +150,23 @@ public Task UploadAsync(
 2. Handler: `CreateDocumentHandler : IRequestHandler<CreateDocument>` (constructor injection for dependencies)
 3. Controller: Inject handler via `[FromServices]`, deserialize body via `[FromBody]`
 4. Registration: `AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>()`
+
+**Pagination Pattern** (`Core/PaginatedResponse.cs`):
+```csharp
+public class PaginatedResponse<T>
+{
+    public required IReadOnlyList<T> Data { get; init; }
+    public required int TotalCount { get; init; }
+    public required int PageNumber { get; init; }
+    public required int PageSize { get; init; }
+    public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+    public bool HasPreviousPage => PageNumber > 1;
+    public bool HasNextPage => PageNumber < TotalPages;
+}
+```
+- Handler returns `PaginatedResponse<TDto>` with data and metadata
+- Controller accepts `pageNumber` and `pageSize` as `[FromQuery]` parameters
+- Example: `ListDocumentsHandler` sorts by `UpdatedAt DESC`, caps pageSize at 100
 
 ### Entity Configuration
 
@@ -252,17 +274,28 @@ cd JasperDocs.WebApp && npm run api:generate
 
 **Usage**:
 ```typescript
-// Generated hooks: usePostApiLogin, usePostApiRefresh, usePostApiLogout, usePostApiDocuments, etc.
-import { usePostApiDocuments } from './api/generated/documents/documents';
+// Generated hooks: usePostApiLogin, useGetApiDocuments, usePostApiDocuments, etc.
+import { usePostApiDocuments, useGetApiDocuments } from './api/generated/documents/documents';
 import { usePostApiLogin } from './api/generated/authentication/authentication';
 
 const loginMutation = usePostApiLogin();
 const response = await loginMutation.mutateAsync({ data: { email, password } });
 // Response: { accessToken, refreshToken, tokenType, expiresIn }
 
+// List with pagination
+const { data } = useGetApiDocuments({ pageNumber: 1, pageSize: 25 });
+// data = PaginatedResponse<DocumentListItemDto> directly (see note below)
+
 const docMutation = usePostApiDocuments();
 await docMutation.mutateAsync({ data: { File: file } }); // For file uploads
 ```
+
+**IMPORTANT - Axios Response Unwrapping**:
+`customAxiosInstance` automatically unwraps axios responses (`.then(({ data }) => data)`). The `data` returned from hooks is the API response object directly, NOT wrapped in `{ data: ... }`.
+
+Example: `useGetApiDocuments` returns `PaginatedResponse<DocumentListItemDto>`, access as:
+- `data.data` (documents array)
+- `data.totalCount`, `data.pageNumber`, etc.
 
 **Auth**: Tokens auto-injected via axios interceptor. Automatic refresh on 401 errors.
 **Config**: `orval.config.ts`, `src/main.tsx` (QueryClientProvider, 5min cache)

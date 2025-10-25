@@ -11,6 +11,14 @@ export interface AccessTokenResponse {
   refreshToken: string;
 }
 
+export interface DocumentListItemDto {
+  id: string;
+  title: string;
+  /** @nullable */
+  description?: string | null;
+  createdAt: string;
+}
+
 export type IFormFile = Blob;
 
 export interface LoginRequest {
@@ -23,6 +31,16 @@ export interface LoginRequest {
 }
 
 export interface LogoutRequest { [key: string]: unknown }
+
+export interface PaginatedResponseOfDocumentListItemDto {
+  data: DocumentListItemDto[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+}
 
 export interface ProblemDetails {
   /** @nullable */
@@ -48,6 +66,11 @@ export interface WeatherForecast {
   /** @nullable */
   summary?: string | null;
 }
+
+export type GetApiDocumentsParams = {
+pageNumber?: number;
+pageSize?: number;
+};
 
 export type PostApiDocumentsBody = {
   File?: IFormFile;
