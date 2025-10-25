@@ -2,11 +2,15 @@ using Microsoft.Extensions.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
+// External parameter for document storage path
+var dataDirPath = builder.AddParameter("data-dir-path");
+
 var postgres = builder.AddPostgres("postgres").WithPgWeb();
 var postgresDb = postgres.AddDatabase("AppDatabase", "jasper-docs");
 
 var webApi = builder.AddProject<Projects.JasperDocs_WebApi>("jasperdocs-webapi")
     .WithReference(postgresDb)
+    .WithEnvironment("DATA_DIR_PATH", dataDirPath)
     .WaitFor(postgresDb);
 
 // In development, run Vite dev server for HMR
