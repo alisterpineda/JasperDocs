@@ -1,4 +1,4 @@
-import { Title, Container, Paper, Stack, Tabs, Center, Loader, Text, Box, TextInput, Textarea, Group, Button } from '@mantine/core'
+import { Title, Container, Stack, Tabs, Center, Loader, Text, Box, TextInput, Textarea, Group, Button, Grid } from '@mantine/core'
 import { useParams } from '@tanstack/react-router'
 import { useGetApiDocumentsId, usePutApiDocumentsId } from '../api/generated/documents/documents'
 import { useEffect, useState } from 'react'
@@ -133,117 +133,142 @@ export function DocumentDetail() {
     )
   }
 
+  // Helper function to render preview content
+  const renderPreviewContent = () => {
+    if (isPdf) {
+      return (
+        <Box style={{ width: '100%', height: '800px' }}>
+          {fileLoading ? (
+            <Center p="xl">
+              <Loader />
+            </Center>
+          ) : fileError ? (
+            <Center p="xl">
+              <Text c="red">{fileError}</Text>
+            </Center>
+          ) : blobUrl ? (
+            <iframe
+              src={blobUrl}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+              }}
+              title={`Preview of ${data.title}`}
+            />
+          ) : null}
+        </Box>
+      )
+    }
+
+    return (
+      <Center p="xl">
+        <Stack align="center" gap="md">
+          <Text c="dimmed" size="lg">
+            Preview not supported for this file type
+          </Text>
+          <Text c="dimmed" size="sm">
+            MIME Type: {selectedVersion?.mimeType}
+          </Text>
+        </Stack>
+      </Center>
+    )
+  }
+
+  // Helper function to render details content
+  const renderDetailsContent = () => {
+    if (isEditMode) {
+      return (
+        <Stack gap="md">
+          <TextInput
+            label="Title"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            required
+            placeholder="Enter document title"
+            error={editTitle.trim() === '' ? 'Title cannot be empty' : undefined}
+          />
+          <Textarea
+            label="Description"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            placeholder="Enter document description (optional)"
+            rows={4}
+          />
+          <Group>
+            <Button
+              onClick={handleSave}
+              loading={isUpdating}
+              disabled={editTitle.trim() === ''}
+            >
+              Save
+            </Button>
+            <Button variant="outline" onClick={handleDiscard} disabled={isUpdating}>
+              Discard
+            </Button>
+          </Group>
+        </Stack>
+      )
+    }
+
+    return (
+      <Stack gap="md">
+        <div>
+          <Text size="sm" fw={500} c="dimmed">Title</Text>
+          <Text size="md">{data.title}</Text>
+        </div>
+        <div>
+          <Text size="sm" fw={500} c="dimmed">Description</Text>
+          <Text size="md">{data.description || 'No description'}</Text>
+        </div>
+        <Group>
+          <Button onClick={handleEdit}>Edit</Button>
+        </Group>
+      </Stack>
+    )
+  }
+
   return (
     <Container fluid py="xs">
       <Stack gap="lg">
         <Title order={1}>{data.title}</Title>
 
-        <Paper shadow="sm" p="md">
-          <Tabs defaultValue="details">
-            <Box
-              style={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 10,
-                backgroundColor: 'var(--mantine-color-body)',
-                paddingBottom: '1rem',
-                marginBottom: '-1rem',
-              }}
-            >
-              <Tabs.List>
-                <Tabs.Tab value="details">Details</Tabs.Tab>
-                <Tabs.Tab value="preview">Preview</Tabs.Tab>
-              </Tabs.List>
-            </Box>
-
-            <Tabs.Panel value="details" pt="md">
-              <Stack gap="md">
-                {isEditMode ? (
-                  <>
-                    <TextInput
-                      label="Title"
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      required
-                      placeholder="Enter document title"
-                      error={editTitle.trim() === '' ? 'Title cannot be empty' : undefined}
-                    />
-                    <Textarea
-                      label="Description"
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      placeholder="Enter document description (optional)"
-                      rows={4}
-                    />
-                    <Group>
-                      <Button
-                        onClick={handleSave}
-                        loading={isUpdating}
-                        disabled={editTitle.trim() === ''}
-                      >
-                        Save
-                      </Button>
-                      <Button variant="outline" onClick={handleDiscard} disabled={isUpdating}>
-                        Discard
-                      </Button>
-                    </Group>
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <Text size="sm" fw={500} c="dimmed">Title</Text>
-                      <Text size="md">{data.title}</Text>
-                    </div>
-                    <div>
-                      <Text size="sm" fw={500} c="dimmed">Description</Text>
-                      <Text size="md">{data.description || 'No description'}</Text>
-                    </div>
-                    <Group>
-                      <Button onClick={handleEdit}>Edit</Button>
-                    </Group>
-                  </>
-                )}
-              </Stack>
-            </Tabs.Panel>
+        {/* Mobile Layout: Single merged tab group */}
+        <Box hiddenFrom="md">
+          <Tabs defaultValue="preview">
+            <Tabs.List>
+              <Tabs.Tab value="preview">Preview</Tabs.Tab>
+              <Tabs.Tab value="details">Details</Tabs.Tab>
+            </Tabs.List>
 
             <Tabs.Panel value="preview" pt="md">
-              {isPdf ? (
-                <Box style={{ width: '100%', height: '800px' }}>
-                  {fileLoading ? (
-                    <Center p="xl">
-                      <Loader />
-                    </Center>
-                  ) : fileError ? (
-                    <Center p="xl">
-                      <Text c="red">{fileError}</Text>
-                    </Center>
-                  ) : blobUrl ? (
-                    <iframe
-                      src={blobUrl}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        border: 'none',
-                      }}
-                      title={`Preview of ${data.title}`}
-                    />
-                  ) : null}
-                </Box>
-              ) : (
-                <Center p="xl">
-                  <Stack align="center" gap="md">
-                    <Text c="dimmed" size="lg">
-                      Preview not supported for this file type
-                    </Text>
-                    <Text c="dimmed" size="sm">
-                      MIME Type: {selectedVersion?.mimeType}
-                    </Text>
-                  </Stack>
-                </Center>
-              )}
+              {renderPreviewContent()}
+            </Tabs.Panel>
+
+            <Tabs.Panel value="details" pt="md">
+              {renderDetailsContent()}
             </Tabs.Panel>
           </Tabs>
-        </Paper>
+        </Box>
+
+        {/* Desktop Layout: Side-by-side preview and details */}
+        <Grid visibleFrom="md" gutter="lg">
+          <Grid.Col span={8}>
+            {renderPreviewContent()}
+          </Grid.Col>
+
+          <Grid.Col span={4}>
+            <Tabs defaultValue="details">
+              <Tabs.List>
+                <Tabs.Tab value="details">Details</Tabs.Tab>
+              </Tabs.List>
+
+              <Tabs.Panel value="details" pt="md">
+                {renderDetailsContent()}
+              </Tabs.Panel>
+            </Tabs>
+          </Grid.Col>
+        </Grid>
       </Stack>
     </Container>
   )
