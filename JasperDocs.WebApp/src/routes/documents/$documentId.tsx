@@ -1,6 +1,7 @@
-import { createFileRoute, redirect, Outlet } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { DocumentDetail } from '../../pages/DocumentDetail'
 
-export const Route = createFileRoute('/documents')({
+export const Route = createFileRoute('/documents/$documentId')({
   beforeLoad: () => {
     // Check if user is authenticated by checking localStorage
     const token = localStorage.getItem('authToken')
@@ -10,11 +11,10 @@ export const Route = createFileRoute('/documents')({
       throw redirect({
         to: '/login',
         search: {
-          // Optionally add redirect parameter to return to documents after login
           redirect: '/documents',
         },
       })
     }
   },
-  component: () => <Outlet />,
+  component: DocumentDetail,
 })

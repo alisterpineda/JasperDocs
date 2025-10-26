@@ -3,6 +3,7 @@ import { IconPlus, IconUpload } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePostApiDocuments, useGetApiDocuments } from '../api/generated/documents/documents';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 
 export function Documents() {
   const [opened, setOpened] = useState(false);
@@ -10,6 +11,7 @@ export function Documents() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 25;
 
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createDocument = usePostApiDocuments();
   const { data, isLoading, isError, error } = useGetApiDocuments({ pageNumber: currentPage, pageSize });
@@ -79,7 +81,11 @@ export function Documents() {
                 </Table.Thead>
                 <Table.Tbody>
                   {data.data.map((document) => (
-                    <Table.Tr key={document.id}>
+                    <Table.Tr
+                      key={document.id}
+                      onClick={() => navigate({ to: '/documents/$documentId', params: { documentId: document.id } })}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <Table.Td>{document.title}</Table.Td>
                       <Table.Td>{document.description || '-'}</Table.Td>
                       <Table.Td>{formatDate(document.createdAt)}</Table.Td>

@@ -19,6 +19,26 @@ export interface DocumentListItemDto {
   createdAt: string;
 }
 
+export interface DocumentVersionDto {
+  id: string;
+  versionNumber: number;
+  /** @nullable */
+  description?: string | null;
+  mimeType: string;
+  createdAt: string;
+}
+
+export interface GetDocumentResponse {
+  id: string;
+  title: string;
+  /** @nullable */
+  description?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  selectedVersion: DocumentVersionDto;
+  availableVersions: DocumentVersionDto[];
+}
+
 export type IFormFile = Blob;
 
 export interface LoginRequest {
@@ -74,6 +94,10 @@ pageSize?: number;
 
 export type PostApiDocumentsBody = {
   File?: IFormFile;
+};
+
+export type GetApiDocumentsIdParams = {
+versionNumber?: number;
 };
 
 export type PostApiDocumentsVersionsBody = {

@@ -104,6 +104,7 @@ builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandle
 
 **Endpoints**:
 - `GET /api/documents` - List documents with pagination (pageNumber, pageSize query params)
+- `GET /api/documents/{id}?versionNumber={optional}` - Get document with specific or latest version
 - `POST /api/documents` - Create document with file upload
 - `POST /api/documents/versions` - Create new version with file upload
 
@@ -236,8 +237,18 @@ public class MyHandler(IOptionsMonitor<StorageOptions> storageOptions)
 
 **Routing**: TanStack Router with file-based routing
 - `/` - Home page
-- `/documents` - Protected documents page
-- `/login` - Authentication page (integrated with `/api/login` endpoint)
+- `/documents` - Protected documents list (index route)
+- `/documents/{id}` - Document detail view
+- `/login` - Authentication page
+
+**Nested Routes Pattern**: Parent routes with children must render `<Outlet />`:
+```
+routes/
+  documents.tsx          # Parent: renders <Outlet /> for children
+  documents/
+    index.tsx           # Child: /documents (list view)
+    $documentId.tsx     # Child: /documents/{id} (detail view)
+```
 
 **Structure**:
 ```

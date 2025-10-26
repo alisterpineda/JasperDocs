@@ -24,10 +24,13 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  GetApiDocumentsIdParams,
   GetApiDocumentsParams,
+  GetDocumentResponse,
   PaginatedResponseOfDocumentListItemDto,
   PostApiDocumentsBody,
-  PostApiDocumentsVersionsBody
+  PostApiDocumentsVersionsBody,
+  ProblemDetails
 } from '../api.schemas';
 
 import { customAxiosInstance } from '../../axios-instance';
@@ -183,7 +186,100 @@ const {mutation: mutationOptions} = options ?
 
       return useMutation(mutationOptions, queryClient);
     }
-    export const postApiDocumentsVersions = (
+    export const getApiDocumentsId = (
+    id: string,
+    params?: GetApiDocumentsIdParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customAxiosInstance<GetDocumentResponse>(
+      {url: `/api/Documents/${id}`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+
+
+export const getGetApiDocumentsIdQueryKey = (id?: string,
+    params?: GetApiDocumentsIdParams,) => {
+    return [
+    `/api/Documents/${id}`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getGetApiDocumentsIdQueryOptions = <TData = Awaited<ReturnType<typeof getApiDocumentsId>>, TError = ProblemDetails>(id: string,
+    params?: GetApiDocumentsIdParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsId>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiDocumentsIdQueryKey(id,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiDocumentsId>>> = ({ signal }) => getApiDocumentsId(id,params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiDocumentsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getApiDocumentsId>>>
+export type GetApiDocumentsIdQueryError = ProblemDetails
+
+
+export function useGetApiDocumentsId<TData = Awaited<ReturnType<typeof getApiDocumentsId>>, TError = ProblemDetails>(
+ id: string,
+    params: undefined |  GetApiDocumentsIdParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiDocumentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getApiDocumentsId>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiDocumentsId<TData = Awaited<ReturnType<typeof getApiDocumentsId>>, TError = ProblemDetails>(
+ id: string,
+    params?: GetApiDocumentsIdParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiDocumentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getApiDocumentsId>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiDocumentsId<TData = Awaited<ReturnType<typeof getApiDocumentsId>>, TError = ProblemDetails>(
+ id: string,
+    params?: GetApiDocumentsIdParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsId>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetApiDocumentsId<TData = Awaited<ReturnType<typeof getApiDocumentsId>>, TError = ProblemDetails>(
+ id: string,
+    params?: GetApiDocumentsIdParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsId>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiDocumentsIdQueryOptions(id,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+export const postApiDocumentsVersions = (
     postApiDocumentsVersionsBody: PostApiDocumentsVersionsBody,
  signal?: AbortSignal
 ) => {

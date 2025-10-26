@@ -31,6 +31,7 @@ builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase");
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateDocumentVersion>, CreateDocumentVersionHandler>();
 builder.Services.AddScoped<IRequestHandler<ListDocuments, PaginatedResponse<DocumentListItemDto>>, ListDocumentsHandler>();
+builder.Services.AddScoped<IRequestHandler<GetDocument, Microsoft.AspNetCore.Http.HttpResults.Results<Microsoft.AspNetCore.Http.HttpResults.Ok<GetDocumentResponse>, Microsoft.AspNetCore.Http.HttpResults.NotFound>>, GetDocumentHandler>();
 builder.Services.AddScoped<IRequestHandler<LoginRequest, Microsoft.AspNetCore.Identity.SignInResult>, LoginHandler>();
 builder.Services.AddScoped<IRequestHandler<LogoutRequest>, LogoutHandler>();
 builder.Services.AddScoped<IRequestHandler<RefreshRequest, IResult>, RefreshHandler>();
