@@ -347,4 +347,88 @@ const {mutation: mutationOptions} = options ?
 
       return useMutation(mutationOptions, queryClient);
     }
+    export const getApiDocumentsVersionsVersionIdFile = (
+    versionId: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customAxiosInstance<void>(
+      {url: `/api/Documents/versions/${versionId}/file`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
+
+export const getGetApiDocumentsVersionsVersionIdFileQueryKey = (versionId?: string,) => {
+    return [
+    `/api/Documents/versions/${versionId}/file`
+    ] as const;
+    }
+
     
+export const getGetApiDocumentsVersionsVersionIdFileQueryOptions = <TData = Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError = ProblemDetails>(versionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiDocumentsVersionsVersionIdFileQueryKey(versionId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>> = ({ signal }) => getApiDocumentsVersionsVersionIdFile(versionId, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(versionId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiDocumentsVersionsVersionIdFileQueryResult = NonNullable<Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>>
+export type GetApiDocumentsVersionsVersionIdFileQueryError = ProblemDetails
+
+
+export function useGetApiDocumentsVersionsVersionIdFile<TData = Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError = ProblemDetails>(
+ versionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiDocumentsVersionsVersionIdFile<TData = Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError = ProblemDetails>(
+ versionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiDocumentsVersionsVersionIdFile<TData = Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError = ProblemDetails>(
+ versionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetApiDocumentsVersionsVersionIdFile<TData = Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError = ProblemDetails>(
+ versionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiDocumentsVersionsVersionIdFile>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiDocumentsVersionsVersionIdFileQueryOptions(versionId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+

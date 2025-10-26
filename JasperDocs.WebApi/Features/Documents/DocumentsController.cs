@@ -46,4 +46,16 @@ public class DocumentsController : ControllerBase
     {
         return requestHandler.HandleAsync(request, ct);
     }
+
+    [HttpGet("versions/{versionId:guid}/file")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public Task<Results<PhysicalFileHttpResult, NotFound>> GetDocumentVersionFileAsync(
+        [FromServices] IRequestHandler<DownloadDocumentVersion, Results<PhysicalFileHttpResult, NotFound>> requestHandler,
+        [FromRoute] Guid versionId,
+        CancellationToken ct = default)
+    {
+        var request = new DownloadDocumentVersion { VersionId = versionId };
+        return requestHandler.HandleAsync(request, ct);
+    }
 }

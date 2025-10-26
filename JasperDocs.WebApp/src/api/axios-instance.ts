@@ -91,3 +91,6 @@ export const customAxiosInstance = <T>(
 
   return promise;
 };
+
+// Export the base axios instance for direct use (e.g., file downloads)
+export { AXIOS_INSTANCE };

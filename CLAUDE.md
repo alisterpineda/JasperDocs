@@ -107,8 +107,11 @@ builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandle
 - `GET /api/documents/{id}?versionNumber={optional}` - Get document with specific or latest version
 - `POST /api/documents` - Create document with file upload
 - `POST /api/documents/versions` - Create new version with file upload
+- `GET /api/documents/versions/{versionId}/file` - Download/stream document file (requires auth, returns file with proper MIME type)
 
 **DDD Pattern**: All Document-related endpoints under `DocumentsController` since Document is the aggregate root.
+
+**File Access Security**: File download endpoint validates path traversal, ensures files are within DataDirectoryPath, and returns 404 if version/file not found.
 
 ### Request/Response Flow
 
@@ -238,8 +241,13 @@ public class MyHandler(IOptionsMonitor<StorageOptions> storageOptions)
 **Routing**: TanStack Router with file-based routing
 - `/` - Home page
 - `/documents` - Protected documents list (index route)
-- `/documents/{id}` - Document detail view
+- `/documents/{id}` - Document detail view with PDF preview
 - `/login` - Authentication page
+
+**Document Preview** (`pages/DocumentDetail.tsx`):
+- PDFs: Fetches file via `AXIOS_INSTANCE` (includes auth token), creates blob URL for `<iframe>` preview
+- Other files: Shows "Preview not supported" message with MIME type
+- Blob URLs cleaned up on unmount to prevent memory leaks
 
 **Nested Routes Pattern**: Parent routes with children must render `<Outlet />`:
 ```
@@ -312,6 +320,8 @@ Example: `useGetApiDocuments` returns `PaginatedResponse<DocumentListItemDto>`, 
 
 **Auth**: Tokens auto-injected via axios interceptor. Automatic refresh on 401 errors.
 **Config**: `orval.config.ts`, `src/main.tsx` (QueryClientProvider, 5min cache)
+
+**Direct axios usage**: For file downloads or custom requests, import `AXIOS_INSTANCE` from `api/axios-instance.ts` (includes auth interceptors, useful for blob responses)
 
 ### Database
 
