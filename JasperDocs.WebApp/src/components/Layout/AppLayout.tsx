@@ -23,7 +23,7 @@ export function AppLayout() {
         breakpoint: 'sm',
         collapsed: { mobile: !opened },
       }}
-      padding="md"
+      padding="xs"
     >
       <AppShell.Header>
         <Navbar opened={opened} toggle={toggle} />

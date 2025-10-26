@@ -41,7 +41,7 @@ export function Documents() {
   };
 
   return (
-    <Container size="lg" py="xl">
+    <Container fluid py="xs">
       <Stack gap="lg">
         <Group justify="space-between">
           <Title order={1}>Documents</Title>

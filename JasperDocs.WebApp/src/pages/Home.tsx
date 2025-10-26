@@ -5,7 +5,7 @@ export function Home() {
   const { user, isAuthenticated } = useAuth();
 
   return (
-    <Container size="lg" py="xl">
+    <Container fluid py="xs">
       <Stack gap="lg">
         <Title order={1}>Welcome to JasperDocs</Title>
         {isAuthenticated ? (

@@ -109,7 +109,7 @@ export function DocumentDetail() {
 
   if (isLoading) {
     return (
-      <Container size="lg" py="xl">
+      <Container fluid py="xs">
         <Center p="xl">
           <Loader />
         </Center>
@@ -119,7 +119,7 @@ export function DocumentDetail() {
 
   if (isError) {
     return (
-      <Container size="lg" py="xl">
+      <Container fluid py="xs">
         <Text c="red">Failed to load document: {error?.message || 'Unknown error'}</Text>
       </Container>
     )
@@ -127,23 +127,34 @@ export function DocumentDetail() {
 
   if (!data) {
     return (
-      <Container size="lg" py="xl">
+      <Container fluid py="xs">
         <Text c="dimmed">Document not found</Text>
       </Container>
     )
   }
 
   return (
-    <Container size="lg" py="xl">
+    <Container fluid py="xs">
       <Stack gap="lg">
         <Title order={1}>{data.title}</Title>
 
         <Paper shadow="sm" p="md">
           <Tabs defaultValue="details">
-            <Tabs.List>
-              <Tabs.Tab value="details">Details</Tabs.Tab>
-              <Tabs.Tab value="preview">Preview</Tabs.Tab>
-            </Tabs.List>
+            <Box
+              style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 10,
+                backgroundColor: 'var(--mantine-color-body)',
+                paddingBottom: '1rem',
+                marginBottom: '-1rem',
+              }}
+            >
+              <Tabs.List>
+                <Tabs.Tab value="details">Details</Tabs.Tab>
+                <Tabs.Tab value="preview">Preview</Tabs.Tab>
+              </Tabs.List>
+            </Box>
 
             <Tabs.Panel value="details" pt="md">
               <Stack gap="md">
