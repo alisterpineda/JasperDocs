@@ -1,6 +1,7 @@
 using JasperDocs.WebApi.Core;
 using JasperDocs.WebApi.Entities;
 using JasperDocs.WebApi.Infrastructure;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -33,6 +34,14 @@ public class CreateDocumentVersionHandler : IRequestHandler<CreateDocumentVersio
             throw new InvalidOperationException($"Document with ID {request.DocumentId} not found.");
         }
 
+        // Determine MIME type from file extension
+        var originalFileName = request.File.FileName;
+        var provider = new FileExtensionContentTypeProvider();
+        if (!provider.TryGetContentType(originalFileName, out var mimeType))
+        {
+            mimeType = "application/octet-stream";
+        }
+
         // Validate storage configuration
         var dataDirectoryPath = _storageOptions.CurrentValue.DataDirectoryPath;
         if (string.IsNullOrWhiteSpace(dataDirectoryPath))
@@ -61,14 +70,14 @@ public class CreateDocumentVersionHandler : IRequestHandler<CreateDocumentVersio
                     VersionNumber = maxVersion + 1,
                     Description = request.Description,
                     CreatedByUserId = _httpContextAccessor.GetUserId(),
-                    StoragePath = string.Empty // Temporary, will update after we have the ID
+                    StoragePath = string.Empty, // Temporary, will update after we have the ID
+                    MimeType = mimeType
                 };
 
                 _context.DocumentVersions.Add(newVersion);
                 await _context.SaveChangesAsync(ct);
 
                 // Now we have the ID, construct the storage path
-                var originalFileName = request.File.FileName;
                 var relativePath = Path.Combine("documents", request.DocumentId.ToString(), newVersion.Id.ToString(), originalFileName);
                 var fullPath = Path.Combine(dataDirectoryPath, relativePath);
 

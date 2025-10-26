@@ -1,6 +1,7 @@
 using JasperDocs.WebApi.Core;
 using JasperDocs.WebApi.Entities;
 using JasperDocs.WebApi.Infrastructure;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -26,6 +27,13 @@ public class CreateDocumentHandler : IRequestHandler<CreateDocument>
     {
         var userId = _httpContextAccessor.GetUserId();
         var originalFileName = request.File.FileName;
+
+        // Determine MIME type from file extension
+        var provider = new FileExtensionContentTypeProvider();
+        if (!provider.TryGetContentType(originalFileName, out var mimeType))
+        {
+            mimeType = "application/octet-stream";
+        }
 
         // Validate storage configuration
         var dataDirectoryPath = _storageOptions.CurrentValue.DataDirectoryPath;
@@ -57,7 +65,8 @@ public class CreateDocumentHandler : IRequestHandler<CreateDocument>
                     VersionNumber = 1,
                     Description = "Initial version",
                     CreatedByUserId = userId,
-                    StoragePath = string.Empty // Temporary, will update after we have the ID
+                    StoragePath = string.Empty, // Temporary, will update after we have the ID
+                    MimeType = mimeType
                 };
 
                 _context.Documents.Add(newDocument);
