@@ -33,6 +33,25 @@ public class DocumentsController : ControllerBase
         return requestHandler.HandleAsync(request, ct);
     }
 
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<string>(StatusCodes.Status400BadRequest)]
+    public Task<Results<Ok, NotFound, BadRequest<string>>> UpdateDocumentAsync(
+        [FromServices] IRequestHandler<UpdateDocument, Results<Ok, NotFound, BadRequest<string>>> requestHandler,
+        [FromRoute] Guid id,
+        [FromBody] UpdateDocumentRequest request,
+        CancellationToken ct = default)
+    {
+        var updateRequest = new UpdateDocument
+        {
+            DocumentId = id,
+            Title = request.Title,
+            Description = request.Description
+        };
+        return requestHandler.HandleAsync(updateRequest, ct);
+    }
+
     [HttpPost()]
     [Consumes("multipart/form-data")]
     public Task CreateDocumentAsync([FromServices] IRequestHandler<CreateDocument> requestHandler, [FromForm] CreateDocument request, CancellationToken ct = default)

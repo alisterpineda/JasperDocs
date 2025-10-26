@@ -79,6 +79,12 @@ export interface RefreshRequest {
   refreshToken: string;
 }
 
+export interface UpdateDocumentRequest {
+  title: string;
+  /** @nullable */
+  description?: string | null;
+}
+
 export interface WeatherForecast {
   date?: string;
   temperatureC?: number;

@@ -30,7 +30,8 @@ import type {
   PaginatedResponseOfDocumentListItemDto,
   PostApiDocumentsBody,
   PostApiDocumentsVersionsBody,
-  ProblemDetails
+  ProblemDetails,
+  UpdateDocumentRequest
 } from '../api.schemas';
 
 import { customAxiosInstance } from '../../axios-instance';
@@ -279,7 +280,65 @@ export function useGetApiDocumentsId<TData = Awaited<ReturnType<typeof getApiDoc
 
 
 
-export const postApiDocumentsVersions = (
+export const putApiDocumentsId = (
+    id: string,
+    updateDocumentRequest: UpdateDocumentRequest,
+ ) => {
+      
+      
+      return customAxiosInstance<void>(
+      {url: `/api/Documents/${id}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateDocumentRequest
+    },
+      );
+    }
+  
+
+
+export const getPutApiDocumentsIdMutationOptions = <TError = string | ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiDocumentsId>>, TError,{id: string;data: UpdateDocumentRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof putApiDocumentsId>>, TError,{id: string;data: UpdateDocumentRequest}, TContext> => {
+
+const mutationKey = ['putApiDocumentsId'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putApiDocumentsId>>, {id: string;data: UpdateDocumentRequest}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putApiDocumentsId(id,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutApiDocumentsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putApiDocumentsId>>>
+    export type PutApiDocumentsIdMutationBody = UpdateDocumentRequest
+    export type PutApiDocumentsIdMutationError = string | ProblemDetails
+
+    export const usePutApiDocumentsId = <TError = string | ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiDocumentsId>>, TError,{id: string;data: UpdateDocumentRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putApiDocumentsId>>,
+        TError,
+        {id: string;data: UpdateDocumentRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getPutApiDocumentsIdMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    export const postApiDocumentsVersions = (
     postApiDocumentsVersionsBody: PostApiDocumentsVersionsBody,
  signal?: AbortSignal
 ) => {
