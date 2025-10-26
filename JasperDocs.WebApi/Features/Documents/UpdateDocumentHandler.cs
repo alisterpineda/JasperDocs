@@ -1,11 +1,11 @@
 using JasperDocs.WebApi.Core;
+using JasperDocs.WebApi.Core.Exceptions;
 using JasperDocs.WebApi.Infrastructure;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace JasperDocs.WebApi.Features.Documents;
 
-public class UpdateDocumentHandler : IRequestHandler<UpdateDocument, Results<Ok, NotFound, BadRequest<string>>>
+public class UpdateDocumentHandler : IRequestHandler<UpdateDocument>
 {
     private readonly ApplicationDbContext _context;
 
@@ -14,14 +14,14 @@ public class UpdateDocumentHandler : IRequestHandler<UpdateDocument, Results<Ok,
         _context = context;
     }
 
-    public async Task<Results<Ok, NotFound, BadRequest<string>>> HandleAsync(
+    public async Task HandleAsync(
         UpdateDocument request,
         CancellationToken ct = default)
     {
         // Validate title is not empty
         if (string.IsNullOrWhiteSpace(request.Title))
         {
-            return TypedResults.BadRequest("Title cannot be empty");
+            throw new ValidationException("Title cannot be empty");
         }
 
         var document = await _context.Documents
@@ -29,7 +29,7 @@ public class UpdateDocumentHandler : IRequestHandler<UpdateDocument, Results<Ok,
 
         if (document == null)
         {
-            return TypedResults.NotFound();
+            throw new NotFoundException("Document", request.DocumentId);
         }
 
         document.Title = request.Title;
@@ -37,7 +37,5 @@ public class UpdateDocumentHandler : IRequestHandler<UpdateDocument, Results<Ok,
         document.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(ct);
-
-        return TypedResults.Ok();
     }
 }

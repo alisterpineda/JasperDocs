@@ -74,8 +74,12 @@ Each feature contains its:
 - Request handlers implementing `IRequestHandler<TRequest>` or `IRequestHandler<TRequest, TResponse>`
 
 **Important**:
-- Handlers return domain types (e.g., `SignInResult`), controllers convert to HTTP responses (e.g., `TypedResults.Problem()`)
+- Handlers return domain types and throw exceptions for error cases (decoupled from ASP.NET)
+- Handlers throw `NotFoundException` (404), `ValidationException` (400), or other domain exceptions
+- Global `ExceptionHandlingMiddleware` converts domain exceptions to HTTP responses automatically
+- Controllers convert domain types to HTTP responses when needed (e.g., `FileDownloadInfo` → `PhysicalFile()`)
 - All API endpoints are prefixed with `/api` via `RoutePrefixConvention` (e.g., `/api/login`, `/api/documents`)
+- **Exception**: `RefreshHandler` returns `IResult` due to deep integration with Identity framework's bearer token mechanism
 
 Register handlers in `Program.cs`:
 ```csharp
@@ -121,6 +125,16 @@ IRequestHandler<TRequest, TResponse>  // Returns Task<TResponse>
 IRequestHandler<TRequest>             // Returns Task (no response data)
 ```
 
+**Error Handling** (`Core/Exceptions/`):
+- `DomainException` - Base class for all domain exceptions
+- `NotFoundException` - Thrown when resource not found (maps to 404)
+- `ValidationException` - Thrown when validation fails (maps to 400)
+- Global `ExceptionHandlingMiddleware` catches exceptions and returns ProblemDetails
+
+**File Downloads** (`Core/FileDownloadInfo.cs`):
+- Handlers return `FileDownloadInfo` domain model (FilePath, MimeType, FileName)
+- Controllers convert to HTTP file results using `PhysicalFile()` method
+
 **Controller Pattern** - Inject handlers per endpoint via `[FromServices]`:
 ```csharp
 // JSON body
@@ -152,7 +166,11 @@ public Task UploadAsync(
 **Example Flow**:
 1. Request DTO: `CreateDocument.cs` (POCO with required/optional properties)
 2. Handler: `CreateDocumentHandler : IRequestHandler<CreateDocument>` (constructor injection for dependencies)
+   - Returns domain types or void
+   - Throws `NotFoundException`, `ValidationException`, or other domain exceptions for errors
 3. Controller: Inject handler via `[FromServices]`, deserialize body via `[FromBody]`
+   - Converts domain types to HTTP responses (e.g., `FileDownloadInfo` → `PhysicalFile()`)
+   - Exception middleware automatically handles exceptions → ProblemDetails responses
 4. Registration: `AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>()`
 
 **Pagination Pattern** (`Core/PaginatedResponse.cs`):

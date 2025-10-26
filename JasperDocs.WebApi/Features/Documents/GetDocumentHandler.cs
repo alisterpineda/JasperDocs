@@ -1,11 +1,11 @@
 using JasperDocs.WebApi.Core;
+using JasperDocs.WebApi.Core.Exceptions;
 using JasperDocs.WebApi.Infrastructure;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace JasperDocs.WebApi.Features.Documents;
 
-public class GetDocumentHandler : IRequestHandler<GetDocument, Results<Ok<GetDocumentResponse>, NotFound>>
+public class GetDocumentHandler : IRequestHandler<GetDocument, GetDocumentResponse>
 {
     private readonly ApplicationDbContext _context;
 
@@ -14,7 +14,7 @@ public class GetDocumentHandler : IRequestHandler<GetDocument, Results<Ok<GetDoc
         _context = context;
     }
 
-    public async Task<Results<Ok<GetDocumentResponse>, NotFound>> HandleAsync(
+    public async Task<GetDocumentResponse> HandleAsync(
         GetDocument request,
         CancellationToken ct = default)
     {
@@ -25,7 +25,7 @@ public class GetDocumentHandler : IRequestHandler<GetDocument, Results<Ok<GetDoc
 
         if (document == null)
         {
-            return TypedResults.NotFound();
+            throw new NotFoundException("Document", request.DocumentId);
         }
 
         // Select the appropriate version
@@ -35,7 +35,10 @@ public class GetDocumentHandler : IRequestHandler<GetDocument, Results<Ok<GetDoc
 
         if (selectedVersion == null)
         {
-            return TypedResults.NotFound();
+            var versionInfo = request.VersionNumber.HasValue
+                ? $"version {request.VersionNumber.Value}"
+                : "any version";
+            throw new NotFoundException($"Document {request.DocumentId} does not have {versionInfo}.");
         }
 
         // Map all versions to DTOs
@@ -51,7 +54,7 @@ public class GetDocumentHandler : IRequestHandler<GetDocument, Results<Ok<GetDoc
             })
             .ToList();
 
-        var response = new GetDocumentResponse
+        return new GetDocumentResponse
         {
             Id = document.Id,
             Title = document.Title,
@@ -68,7 +71,5 @@ public class GetDocumentHandler : IRequestHandler<GetDocument, Results<Ok<GetDoc
             },
             AvailableVersions = availableVersions
         };
-
-        return TypedResults.Ok(response);
     }
 }

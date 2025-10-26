@@ -1,5 +1,4 @@
 using JasperDocs.WebApi.Core;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JasperDocs.WebApi.Features.Documents;
@@ -23,8 +22,8 @@ public class DocumentsController : ControllerBase
     [HttpGet("{id:guid}")]
     [ProducesResponseType<GetDocumentResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task<Results<Ok<GetDocumentResponse>, NotFound>> GetDocumentAsync(
-        [FromServices] IRequestHandler<GetDocument, Results<Ok<GetDocumentResponse>, NotFound>> requestHandler,
+    public Task<GetDocumentResponse> GetDocumentAsync(
+        [FromServices] IRequestHandler<GetDocument, GetDocumentResponse> requestHandler,
         [FromRoute] Guid id,
         [FromQuery] int? versionNumber = null,
         CancellationToken ct = default)
@@ -37,8 +36,8 @@ public class DocumentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<string>(StatusCodes.Status400BadRequest)]
-    public Task<Results<Ok, NotFound, BadRequest<string>>> UpdateDocumentAsync(
-        [FromServices] IRequestHandler<UpdateDocument, Results<Ok, NotFound, BadRequest<string>>> requestHandler,
+    public Task UpdateDocumentAsync(
+        [FromServices] IRequestHandler<UpdateDocument> requestHandler,
         [FromRoute] Guid id,
         [FromBody] UpdateDocumentRequest request,
         CancellationToken ct = default)
@@ -69,12 +68,19 @@ public class DocumentsController : ControllerBase
     [HttpGet("versions/{versionId:guid}/file")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task<Results<PhysicalFileHttpResult, NotFound>> GetDocumentVersionFileAsync(
-        [FromServices] IRequestHandler<DownloadDocumentVersion, Results<PhysicalFileHttpResult, NotFound>> requestHandler,
+    public async Task<IActionResult> GetDocumentVersionFileAsync(
+        [FromServices] IRequestHandler<DownloadDocumentVersion, FileDownloadInfo> requestHandler,
         [FromRoute] Guid versionId,
         CancellationToken ct = default)
     {
         var request = new DownloadDocumentVersion { VersionId = versionId };
-        return requestHandler.HandleAsync(request, ct);
+        var fileInfo = await requestHandler.HandleAsync(request, ct);
+
+        // Convert domain model to HTTP file result
+        return PhysicalFile(
+            fileInfo.FilePath,
+            fileInfo.MimeType,
+            fileInfo.FileName,
+            fileInfo.EnableRangeProcessing);
     }
 }

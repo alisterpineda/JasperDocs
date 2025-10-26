@@ -1,12 +1,12 @@
 using JasperDocs.WebApi.Core;
+using JasperDocs.WebApi.Core.Exceptions;
 using JasperDocs.WebApi.Infrastructure;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace JasperDocs.WebApi.Features.Documents;
 
-public class DownloadDocumentVersionHandler : IRequestHandler<DownloadDocumentVersion, Results<PhysicalFileHttpResult, NotFound>>
+public class DownloadDocumentVersionHandler : IRequestHandler<DownloadDocumentVersion, FileDownloadInfo>
 {
     private readonly ApplicationDbContext _context;
     private readonly IOptionsMonitor<StorageOptions> _storageOptions;
@@ -19,7 +19,7 @@ public class DownloadDocumentVersionHandler : IRequestHandler<DownloadDocumentVe
         _storageOptions = storageOptions;
     }
 
-    public async Task<Results<PhysicalFileHttpResult, NotFound>> HandleAsync(
+    public async Task<FileDownloadInfo> HandleAsync(
         DownloadDocumentVersion request,
         CancellationToken ct = default)
     {
@@ -30,7 +30,7 @@ public class DownloadDocumentVersionHandler : IRequestHandler<DownloadDocumentVe
 
         if (version == null)
         {
-            return TypedResults.NotFound();
+            throw new NotFoundException("DocumentVersion", request.VersionId);
         }
 
         // Validate storage configuration
@@ -60,17 +60,18 @@ public class DownloadDocumentVersionHandler : IRequestHandler<DownloadDocumentVe
         // Check if file exists
         if (!File.Exists(normalizedFullPath))
         {
-            return TypedResults.NotFound();
+            throw new NotFoundException($"File for DocumentVersion {request.VersionId} not found on disk.");
         }
 
         // Extract filename from the storage path
         var fileName = Path.GetFileName(version.StoragePath);
 
-        // Return the file with inline disposition for browser preview
-        return TypedResults.PhysicalFile(
-            normalizedFullPath,
-            contentType: version.MimeType,
-            fileDownloadName: fileName,
-            enableRangeProcessing: true);
+        return new FileDownloadInfo
+        {
+            FilePath = normalizedFullPath,
+            MimeType = version.MimeType,
+            FileName = fileName,
+            EnableRangeProcessing = true
+        };
     }
 }

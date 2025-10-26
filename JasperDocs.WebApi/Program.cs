@@ -31,9 +31,9 @@ builder.AddNpgsqlDbContext<ApplicationDbContext>(connectionName: "AppDatabase");
 builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateDocumentVersion>, CreateDocumentVersionHandler>();
 builder.Services.AddScoped<IRequestHandler<ListDocuments, PaginatedResponse<DocumentListItemDto>>, ListDocumentsHandler>();
-builder.Services.AddScoped<IRequestHandler<GetDocument, Microsoft.AspNetCore.Http.HttpResults.Results<Microsoft.AspNetCore.Http.HttpResults.Ok<GetDocumentResponse>, Microsoft.AspNetCore.Http.HttpResults.NotFound>>, GetDocumentHandler>();
-builder.Services.AddScoped<IRequestHandler<UpdateDocument, Microsoft.AspNetCore.Http.HttpResults.Results<Microsoft.AspNetCore.Http.HttpResults.Ok, Microsoft.AspNetCore.Http.HttpResults.NotFound, Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>>, UpdateDocumentHandler>();
-builder.Services.AddScoped<IRequestHandler<DownloadDocumentVersion, Microsoft.AspNetCore.Http.HttpResults.Results<Microsoft.AspNetCore.Http.HttpResults.PhysicalFileHttpResult, Microsoft.AspNetCore.Http.HttpResults.NotFound>>, DownloadDocumentVersionHandler>();
+builder.Services.AddScoped<IRequestHandler<GetDocument, GetDocumentResponse>, GetDocumentHandler>();
+builder.Services.AddScoped<IRequestHandler<UpdateDocument>, UpdateDocumentHandler>();
+builder.Services.AddScoped<IRequestHandler<DownloadDocumentVersion, FileDownloadInfo>, DownloadDocumentVersionHandler>();
 builder.Services.AddScoped<IRequestHandler<LoginRequest, Microsoft.AspNetCore.Identity.SignInResult>, LoginHandler>();
 builder.Services.AddScoped<IRequestHandler<LogoutRequest>, LogoutHandler>();
 builder.Services.AddScoped<IRequestHandler<RefreshRequest, IResult>, RefreshHandler>();
@@ -91,6 +91,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+// Add global exception handling middleware
+app.UseExceptionHandling();
 
 app.UseHttpsRedirection();
 
