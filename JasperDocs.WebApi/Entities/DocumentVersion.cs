@@ -8,6 +8,8 @@ public class DocumentVersion
     public string? Description { get; set; }
     public required string StoragePath { get; set; }
     public required string MimeType { get; set; }
+    public required string OriginalFileName { get; set; }
+    public string? FileExtension { get; set; }
     public DateTime CreatedAt { get; init; }
     public Guid? CreatedByUserId { get; init; }
 

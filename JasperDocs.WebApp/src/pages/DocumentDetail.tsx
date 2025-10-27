@@ -253,10 +253,10 @@ export function DocumentDetail() {
 
       {/* Desktop Layout: Side-by-side preview and details */}
       <Flex visibleFrom="md" gap="lg" style={{ flexGrow: 1 }}>
-        <Box style={{ flexGrow: 3 }}>
+        <Box style={{ flexGrow: 1 }}>
           {renderPreviewContent()}
         </Box>
-        <Box style={{ flexGrow: 1 }}>
+        <Box style={{ width: '350px', flexShrink: 0 }}>
           <Tabs defaultValue="details">
             <Tabs.List>
               <Tabs.Tab value="details">Details</Tabs.Tab>

@@ -89,16 +89,18 @@ builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandle
 ### Domain Model: Documents and Versioning
 
 **Document** is an aggregate root with **DocumentVersion** child entities:
-- Document: Title (from uploaded filename), Description (nullable), CreatedByUserId, Versions collection
-- DocumentVersion: DocumentId, VersionNumber (int), Description (nullable), **StoragePath (required)**, CreatedByUserId, CreatedAt
+- Document: Title (filename without extension), Description (nullable), CreatedByUserId, Versions collection
+- DocumentVersion: DocumentId, VersionNumber, Description, **StoragePath**, MimeType, **OriginalFileName**, **FileExtension** (nullable), CreatedByUserId, CreatedAt
 - Unique constraint: (DocumentId, VersionNumber)
 - Cascade delete: Deleting Document removes all Versions
 
 **File Upload & Storage**:
-- Every DocumentVersion requires a file upload (StoragePath is required)
-- Files stored at: `{DataDirectoryPath}/documents/{documentId}/{versionId}/{filename}`
-- StoragePath contains relative path from DataDirectoryPath for portability
-- Document.Title is set to uploaded file's original filename
+- Files stored with GUID-based names: `{DataDirectoryPath}/documents/{documentId}/{versionId}{.ext}`
+- StoragePath contains relative path from DataDirectoryPath (e.g., `documents/abc/xyz.pdf`)
+- OriginalFileName preserves full uploaded filename for audit trail
+- FileExtension extracted via `FileExtensionHelper` (supports compound extensions: `.tar.gz`, `.tar.bz2`, `.tar.xz`, `.tar.zst`)
+- Document.Title set to filename without extension (e.g., `report.tar.gz` → Title: `report`)
+- Downloads reconstruct filename as `Title + FileExtension` for user-friendly names
 
 **Versioning Behavior**:
 - Creating a Document requires file upload via multipart/form-data

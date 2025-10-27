@@ -28,6 +28,10 @@ public class CreateDocumentHandler : IRequestHandler<CreateDocument>
         var userId = _httpContextAccessor.GetUserId();
         var originalFileName = request.File.FileName;
 
+        // Extract file extension (including compound extensions like .tar.gz)
+        var fileExtension = FileExtensionHelper.GetFileExtension(originalFileName);
+        var titleWithoutExtension = FileExtensionHelper.StripExtension(originalFileName);
+
         // Determine MIME type from file extension
         var provider = new FileExtensionContentTypeProvider();
         if (!provider.TryGetContentType(originalFileName, out var mimeType))
@@ -54,7 +58,7 @@ public class CreateDocumentHandler : IRequestHandler<CreateDocument>
             {
                 var newDocument = new Document
                 {
-                    Title = originalFileName,
+                    Title = titleWithoutExtension,
                     Description = null,
                     CreatedByUserId = userId
                 };
@@ -66,15 +70,18 @@ public class CreateDocumentHandler : IRequestHandler<CreateDocument>
                     Description = "Initial version",
                     CreatedByUserId = userId,
                     StoragePath = string.Empty, // Temporary, will update after we have the ID
-                    MimeType = mimeType
+                    MimeType = mimeType,
+                    OriginalFileName = originalFileName,
+                    FileExtension = fileExtension
                 };
 
                 _context.Documents.Add(newDocument);
                 _context.DocumentVersions.Add(initialVersion);
                 await _context.SaveChangesAsync(ct);
 
-                // Now we have the IDs, construct the storage path
-                var relativePath = Path.Combine("documents", newDocument.Id.ToString(), initialVersion.Id.ToString(), originalFileName);
+                // Now we have the IDs, construct the storage path using GUID + extension
+                var fileName = initialVersion.Id.ToString() + (fileExtension ?? string.Empty);
+                var relativePath = Path.Combine("documents", newDocument.Id.ToString(), fileName);
                 var fullPath = Path.Combine(dataDirectoryPath, relativePath);
 
                 // Create directory if it doesn't exist

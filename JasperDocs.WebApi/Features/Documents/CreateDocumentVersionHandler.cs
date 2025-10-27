@@ -34,8 +34,11 @@ public class CreateDocumentVersionHandler : IRequestHandler<CreateDocumentVersio
             throw new InvalidOperationException($"Document with ID {request.DocumentId} not found.");
         }
 
-        // Determine MIME type from file extension
+        // Extract file extension (including compound extensions like .tar.gz)
         var originalFileName = request.File.FileName;
+        var fileExtension = FileExtensionHelper.GetFileExtension(originalFileName);
+
+        // Determine MIME type from file extension
         var provider = new FileExtensionContentTypeProvider();
         if (!provider.TryGetContentType(originalFileName, out var mimeType))
         {
@@ -71,14 +74,17 @@ public class CreateDocumentVersionHandler : IRequestHandler<CreateDocumentVersio
                     Description = request.Description,
                     CreatedByUserId = _httpContextAccessor.GetUserId(),
                     StoragePath = string.Empty, // Temporary, will update after we have the ID
-                    MimeType = mimeType
+                    MimeType = mimeType,
+                    OriginalFileName = originalFileName,
+                    FileExtension = fileExtension
                 };
 
                 _context.DocumentVersions.Add(newVersion);
                 await _context.SaveChangesAsync(ct);
 
-                // Now we have the ID, construct the storage path
-                var relativePath = Path.Combine("documents", request.DocumentId.ToString(), newVersion.Id.ToString(), originalFileName);
+                // Now we have the ID, construct the storage path using GUID + extension
+                var fileName = newVersion.Id.ToString() + (fileExtension ?? string.Empty);
+                var relativePath = Path.Combine("documents", request.DocumentId.ToString(), fileName);
                 var fullPath = Path.Combine(dataDirectoryPath, relativePath);
 
                 // Create directory if it doesn't exist

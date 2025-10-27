@@ -29,6 +29,15 @@ public class DocumentVersionEntityTypeConfiguration : IEntityTypeConfiguration<D
             .IsRequired();
 
         builder
+            .Property(e => e.OriginalFileName)
+            .IsRequired()
+            .HasMaxLength(255);
+
+        builder
+            .Property(e => e.FileExtension)
+            .HasMaxLength(50);
+
+        builder
             .HasOne(e => e.Document)
             .WithMany(d => d.Versions)
             .HasForeignKey(e => e.DocumentId)

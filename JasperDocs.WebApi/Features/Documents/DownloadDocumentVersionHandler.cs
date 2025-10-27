@@ -23,8 +23,9 @@ public class DownloadDocumentVersionHandler : IRequestHandler<DownloadDocumentVe
         DownloadDocumentVersion request,
         CancellationToken ct = default)
     {
-        // Fetch the document version
+        // Fetch the document version with its parent document
         var version = await _context.DocumentVersions
+            .Include(v => v.Document)
             .AsNoTracking()
             .FirstOrDefaultAsync(v => v.Id == request.VersionId, ct);
 
@@ -63,8 +64,8 @@ public class DownloadDocumentVersionHandler : IRequestHandler<DownloadDocumentVe
             throw new NotFoundException($"File for DocumentVersion {request.VersionId} not found on disk.");
         }
 
-        // Extract filename from the storage path
-        var fileName = Path.GetFileName(version.StoragePath);
+        // Reconstruct the filename from Document.Title + FileExtension
+        var fileName = version.Document.Title + (version.FileExtension ?? string.Empty);
 
         return new FileDownloadInfo
         {
