@@ -1,4 +1,4 @@
-import { Title, Container, Stack, Tabs, Center, Loader, Text, Box, TextInput, Textarea, Group, Button, Grid } from '@mantine/core'
+import { Title, Container, Stack, Tabs, Center, Loader, Text, Box, TextInput, Textarea, Group, Button, Grid, Flex } from '@mantine/core'
 import { useParams } from '@tanstack/react-router'
 import { useGetApiDocumentsId, usePutApiDocumentsId } from '../api/generated/documents/documents'
 import { useEffect, useState } from 'react'
@@ -137,7 +137,7 @@ export function DocumentDetail() {
   const renderPreviewContent = () => {
     if (isPdf) {
       return (
-        <Box style={{ width: '100%', height: '800px' }}>
+        <Box style={{ width: '100%', height: '100%' }}>
           {fileLoading ? (
             <Center p="xl">
               <Loader />
@@ -153,6 +153,7 @@ export function DocumentDetail() {
                 width: '100%',
                 height: '100%',
                 border: 'none',
+                overflow: 'hidden'
               }}
               title={`Preview of ${data.title}`}
             />
@@ -229,47 +230,44 @@ export function DocumentDetail() {
   }
 
   return (
-    <Container fluid py="xs">
-      <Stack gap="lg">
-        <Title order={1}>{data.title}</Title>
+    <Stack gap="lg" h="calc(100vh - var(--app-shell-header-height, 0px) - var(--app-shell-footer-height, 0px) - 2 * var(--mantine-spacing-md, 0px))" style={{overflow: "hidden"}}>
+      <Title order={1}>{data.title}</Title>
 
-        {/* Mobile Layout: Single merged tab group */}
-        <Box hiddenFrom="md">
-          <Tabs defaultValue="preview">
+      {/* Mobile Layout: Single merged tab group */}
+      <Flex direction="column" hiddenFrom="md" style={{ flexGrow: 1 }}>
+        <Tabs defaultValue="preview" style={{ flexGrow: 1 }}>
+          <Tabs.List>
+            <Tabs.Tab value="preview">Preview</Tabs.Tab>
+            <Tabs.Tab value="details">Details</Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="preview" pt="md" h="100%">
+            {renderPreviewContent()}
+          </Tabs.Panel>
+
+          <Tabs.Panel value="details" pt="md">
+            {renderDetailsContent()}
+          </Tabs.Panel>
+        </Tabs>
+      </Flex>
+
+      {/* Desktop Layout: Side-by-side preview and details */}
+      <Flex visibleFrom="md" gap="lg" style={{ flexGrow: 1 }}>
+        <Box style={{ flexGrow: 3 }}>
+          {renderPreviewContent()}
+        </Box>
+        <Box style={{ flexGrow: 1 }}>
+          <Tabs defaultValue="details">
             <Tabs.List>
-              <Tabs.Tab value="preview">Preview</Tabs.Tab>
               <Tabs.Tab value="details">Details</Tabs.Tab>
             </Tabs.List>
-
-            <Tabs.Panel value="preview" pt="md">
-              {renderPreviewContent()}
-            </Tabs.Panel>
 
             <Tabs.Panel value="details" pt="md">
               {renderDetailsContent()}
             </Tabs.Panel>
           </Tabs>
         </Box>
-
-        {/* Desktop Layout: Side-by-side preview and details */}
-        <Grid visibleFrom="md" gutter="lg">
-          <Grid.Col span={8}>
-            {renderPreviewContent()}
-          </Grid.Col>
-
-          <Grid.Col span={4}>
-            <Tabs defaultValue="details">
-              <Tabs.List>
-                <Tabs.Tab value="details">Details</Tabs.Tab>
-              </Tabs.List>
-
-              <Tabs.Panel value="details" pt="md">
-                {renderDetailsContent()}
-              </Tabs.Panel>
-            </Tabs>
-          </Grid.Col>
-        </Grid>
-      </Stack>
-    </Container>
+      </Flex>
+    </Stack>
   )
 }
