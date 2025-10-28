@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { AccessTokenResponse } from '../api/generated/api.schemas';
-import { postApiLogout } from '../api/generated/authentication/authentication';
+import { postApiLogout, useGetApiUsersMeInfo } from '../api/generated/authentication/authentication';
 import { tokenRefreshService } from '../services/tokenRefresh';
 import { AuthContext } from './auth-context';
 
@@ -10,6 +10,63 @@ const AUTH_STORAGE_KEY = 'auth:state';
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<{ username?: string } | null>(null);
+
+  // Logout function (defined early so it can be used by validation query)
+  const logout = useCallback(async () => {
+    try {
+      // Call backend logout endpoint
+      await postApiLogout({});
+    } catch (error) {
+      console.error('Logout API call failed:', error);
+      // Continue with local logout even if API call fails
+    }
+
+    // Clear all auth data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('username');
+
+    // Clear token refresh service state
+    tokenRefreshService.clear();
+
+    // Update state and notify other tabs
+    setIsAuthenticated(false);
+    setUser(null);
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  }, []);
+
+  // Validate token on app initialization
+  const [shouldValidate] = useState(() => {
+    return !!localStorage.getItem('authToken') && !!localStorage.getItem('refreshToken');
+  });
+
+  const validationQuery = useGetApiUsersMeInfo({
+    query: {
+      enabled: shouldValidate,
+      retry: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    },
+  });
+
+  // Handle validation query results
+  useEffect(() => {
+    if (validationQuery.isSuccess && validationQuery.data) {
+      // Update user state with actual username from API
+      setUser({ username: validationQuery.data.username });
+    }
+
+    if (validationQuery.isError) {
+      const error = validationQuery.error as any;
+      // On 401 (unauthorized) or 404 (user not found), logout silently
+      if (error?.response?.status === 401 || error?.response?.status === 404) {
+        console.log('Token validation failed, logging out');
+        logout();
+      }
+      // For other errors (network issues, etc.), don't logout
+    }
+  }, [validationQuery.isSuccess, validationQuery.isError, validationQuery.data, validationQuery.error, logout]);
 
   // Function to update auth state and notify other tabs
   const updateAuthState = useCallback((authenticated: boolean, username?: string) => {
@@ -51,27 +108,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, [updateAuthState, refreshTokens]);
 
-  // Logout function
-  const logout = useCallback(async () => {
-    try {
-      // Call backend logout endpoint
-      await postApiLogout({});
-    } catch (error) {
-      console.error('Logout API call failed:', error);
-      // Continue with local logout even if API call fails
-    }
-
-    // Clear all auth data
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('username');
-
-    // Clear token refresh service state
-    tokenRefreshService.clear();
-
-    // Update state and notify other tabs
-    updateAuthState(false);
-  }, [updateAuthState]);
 
   // Initialize auth state on mount
   useEffect(() => {

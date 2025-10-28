@@ -28,10 +28,11 @@ AXIOS_INSTANCE.interceptors.response.use(
 
     // Check if error is 401 and we haven't already tried to refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
-      // Don't retry for login, refresh, or logout endpoints
+      // Don't retry for auth endpoints or token validation endpoint
       const isAuthEndpoint = originalRequest.url?.includes('/api/login') ||
                             originalRequest.url?.includes('/api/refresh') ||
-                            originalRequest.url?.includes('/api/logout');
+                            originalRequest.url?.includes('/api/logout') ||
+                            originalRequest.url?.includes('/api/users/me/info');
 
       if (isAuthEndpoint) {
         return Promise.reject(error);
