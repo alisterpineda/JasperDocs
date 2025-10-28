@@ -60,4 +60,15 @@ public class AuthenticationController : ControllerBase
         await handler.HandleAsync(request, ct);
         return TypedResults.Ok();
     }
+
+    [HttpGet("users/me/info")]
+    [ProducesResponseType<GetCurrentUserInfoResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public Task<GetCurrentUserInfoResponse> GetCurrentUserInfoAsync(
+        [FromServices] IRequestHandler<GetCurrentUserInfo, GetCurrentUserInfoResponse> handler,
+        CancellationToken ct = default)
+    {
+        return handler.HandleAsync(new GetCurrentUserInfo(), ct);
+    }
 }

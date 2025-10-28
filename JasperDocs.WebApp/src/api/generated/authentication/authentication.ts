@@ -5,17 +5,27 @@
  * OpenAPI spec version: 1.0.0
  */
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
   AccessTokenResponse,
+  GetCurrentUserInfoResponse,
   LoginRequest,
   LogoutRequest,
   ProblemDetails,
@@ -201,4 +211,88 @@ const {mutation: mutationOptions} = options ?
 
       return useMutation(mutationOptions, queryClient);
     }
+    export const getApiUsersMeInfo = (
     
+ signal?: AbortSignal
+) => {
+      
+      
+      return customAxiosInstance<GetCurrentUserInfoResponse>(
+      {url: `/api/users/me/info`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
+
+export const getGetApiUsersMeInfoQueryKey = () => {
+    return [
+    `/api/users/me/info`
+    ] as const;
+    }
+
+    
+export const getGetApiUsersMeInfoQueryOptions = <TData = Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError = ProblemDetails | ProblemDetails>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiUsersMeInfoQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiUsersMeInfo>>> = ({ signal }) => getApiUsersMeInfo(signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiUsersMeInfoQueryResult = NonNullable<Awaited<ReturnType<typeof getApiUsersMeInfo>>>
+export type GetApiUsersMeInfoQueryError = ProblemDetails | ProblemDetails
+
+
+export function useGetApiUsersMeInfo<TData = Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError = ProblemDetails | ProblemDetails>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiUsersMeInfo>>,
+          TError,
+          Awaited<ReturnType<typeof getApiUsersMeInfo>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiUsersMeInfo<TData = Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError = ProblemDetails | ProblemDetails>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiUsersMeInfo>>,
+          TError,
+          Awaited<ReturnType<typeof getApiUsersMeInfo>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiUsersMeInfo<TData = Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError = ProblemDetails | ProblemDetails>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetApiUsersMeInfo<TData = Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError = ProblemDetails | ProblemDetails>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeInfo>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiUsersMeInfoQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+

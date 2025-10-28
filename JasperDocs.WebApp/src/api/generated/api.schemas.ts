@@ -28,6 +28,11 @@ export interface DocumentVersionDto {
   createdAt: string;
 }
 
+export interface GetCurrentUserInfoResponse {
+  id: string;
+  username: string;
+}
+
 export interface GetDocumentResponse {
   id: string;
   title: string;

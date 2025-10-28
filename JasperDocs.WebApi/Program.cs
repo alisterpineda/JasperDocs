@@ -37,6 +37,7 @@ builder.Services.AddScoped<IRequestHandler<DownloadDocumentVersion, FileDownload
 builder.Services.AddScoped<IRequestHandler<LoginRequest, Microsoft.AspNetCore.Identity.SignInResult>, LoginHandler>();
 builder.Services.AddScoped<IRequestHandler<LogoutRequest>, LogoutHandler>();
 builder.Services.AddScoped<IRequestHandler<RefreshRequest, IResult>, RefreshHandler>();
+builder.Services.AddScoped<IRequestHandler<GetCurrentUserInfo, GetCurrentUserInfoResponse>, GetCurrentUserInfoHandler>();
 
 builder.Services.AddControllers(options =>
 {
