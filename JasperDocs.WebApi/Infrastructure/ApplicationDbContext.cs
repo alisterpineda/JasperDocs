@@ -14,6 +14,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     
     public DbSet<Document> Documents { get; set; }
     public DbSet<DocumentVersion> DocumentVersions { get; set; }
+    public DbSet<Party> Parties { get; set; }
+    public DbSet<DocumentParty> DocumentParties { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

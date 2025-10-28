@@ -1,10 +1,9 @@
 namespace JasperDocs.WebApi.Entities;
 
-public class Document
+public class Party
 {
     public Guid Id { get; set; }
-    public required string Title { get; set; }
-    public string? Description { get; set; }
+    public required string Name { get; set; }
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; set; }
     public Guid? CreatedByUserId { get; init; }
@@ -12,7 +11,6 @@ public class Document
     #region Navigation Properties
 
     public ApplicationUser? CreatedByUser { get; init; }
-    public ICollection<DocumentVersion> Versions { get; set; } = new List<DocumentVersion>();
     public ICollection<DocumentParty> DocumentParties { get; set; } = new List<DocumentParty>();
 
     #endregion

@@ -18,9 +18,11 @@ public class GetDocumentHandler : IRequestHandler<GetDocument, GetDocumentRespon
         GetDocument request,
         CancellationToken ct = default)
     {
-        // Fetch document with all versions
+        // Fetch document with all versions and parties
         var document = await _context.Documents
             .Include(d => d.Versions)
+            .Include(d => d.DocumentParties)
+                .ThenInclude(dp => dp.Party)
             .FirstOrDefaultAsync(d => d.Id == request.DocumentId, ct);
 
         if (document == null)
@@ -54,6 +56,16 @@ public class GetDocumentHandler : IRequestHandler<GetDocument, GetDocumentRespon
             })
             .ToList();
 
+        // Map all parties to DTOs
+        var parties = document.DocumentParties
+            .Select(dp => new DocumentPartyDto
+            {
+                Id = dp.Party.Id,
+                Name = dp.Party.Name
+            })
+            .OrderBy(p => p.Name)
+            .ToList();
+
         return new GetDocumentResponse
         {
             Id = document.Id,
@@ -69,7 +81,8 @@ public class GetDocumentHandler : IRequestHandler<GetDocument, GetDocumentRespon
                 MimeType = selectedVersion.MimeType,
                 CreatedAt = selectedVersion.CreatedAt
             },
-            AvailableVersions = availableVersions
+            AvailableVersions = availableVersions,
+            Parties = parties
         };
     }
 }

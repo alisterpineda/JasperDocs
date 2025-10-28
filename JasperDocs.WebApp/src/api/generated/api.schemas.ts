@@ -11,12 +11,25 @@ export interface AccessTokenResponse {
   refreshToken: string;
 }
 
+export interface AddPartyToDocumentRequest {
+  partyId: string;
+}
+
+export interface CreateParty {
+  name: string;
+}
+
 export interface DocumentListItemDto {
   id: string;
   title: string;
   /** @nullable */
   description?: string | null;
   createdAt: string;
+}
+
+export interface DocumentPartyDto {
+  id: string;
+  name: string;
 }
 
 export interface DocumentVersionDto {
@@ -42,6 +55,14 @@ export interface GetDocumentResponse {
   updatedAt: string;
   selectedVersion: DocumentVersionDto;
   availableVersions: DocumentVersionDto[];
+  parties: DocumentPartyDto[];
+}
+
+export interface GetPartyResponse {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type IFormFile = Blob;
@@ -67,6 +88,22 @@ export interface PaginatedResponseOfDocumentListItemDto {
   hasNextPage?: boolean;
 }
 
+export interface PaginatedResponseOfPartyListItemDto {
+  data: PartyListItemDto[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+}
+
+export interface PartyListItemDto {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 export interface ProblemDetails {
   /** @nullable */
   type?: string | null;
@@ -90,6 +127,10 @@ export interface UpdateDocumentRequest {
   description?: string | null;
 }
 
+export interface UpdatePartyRequest {
+  name: string;
+}
+
 export interface WeatherForecast {
   date?: string;
   temperatureC?: number;
@@ -97,6 +138,11 @@ export interface WeatherForecast {
   /** @nullable */
   summary?: string | null;
 }
+
+export type GetApiPartiesParams = {
+pageNumber?: number;
+pageSize?: number;
+};
 
 export type GetApiDocumentsParams = {
 pageNumber?: number;

@@ -9,6 +9,7 @@ public class GetDocumentResponse
     public required DateTime UpdatedAt { get; init; }
     public required DocumentVersionDto SelectedVersion { get; init; }
     public required IReadOnlyList<DocumentVersionDto> AvailableVersions { get; init; }
+    public required IReadOnlyList<DocumentPartyDto> Parties { get; init; }
 }
 
 public class DocumentVersionDto

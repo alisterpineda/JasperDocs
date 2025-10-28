@@ -119,6 +119,25 @@ builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandle
 
 **File Access Security**: File download endpoint validates path traversal, ensures files are within DataDirectoryPath, and returns 404 if version/file not found.
 
+### Domain Model: Parties
+
+**Party** entity tracks people/organizations associated with documents:
+- Party: Id, Name, CreatedAt, UpdatedAt, CreatedByUserId
+- **DocumentParty** join table: Many-to-many relationship with Documents (DocumentId, PartyId, CreatedAt)
+- Cascade delete: Deleting Document or Party removes associations
+
+**Endpoints**:
+- `GET /api/parties` - List parties with pagination
+- `POST /api/parties` - Create party (body: `{ name: "..." }`)
+- `GET /api/parties/{id}` - Get party details
+- `PUT /api/parties/{id}` - Update party name
+- `GET /api/documents/{id}/parties` - List parties for document
+- `POST /api/documents/{id}/parties` - Associate party (body: `{ partyId: "..." }`)
+- `DELETE /api/documents/{id}/parties/{partyId}` - Remove association
+- `GET /api/documents/{id}` includes `parties` array
+
+**Behavior**: Add/remove operations are idempotent. Parties sorted alphabetically in responses.
+
 ### Request/Response Flow
 
 **Handler Interfaces** (`Core/IRequestHandler.cs`):
@@ -315,8 +334,9 @@ cd JasperDocs.WebApp && npm run api:generate
 
 **Usage**:
 ```typescript
-// Generated hooks: usePostApiLogin, useGetApiDocuments, usePostApiDocuments, etc.
+// Generated hooks: usePostApiLogin, useGetApiDocuments, useGetApiParties, etc.
 import { usePostApiDocuments, useGetApiDocuments } from './api/generated/documents/documents';
+import { useGetApiParties, usePostApiParties } from './api/generated/parties/parties';
 import { usePostApiLogin } from './api/generated/authentication/authentication';
 
 const loginMutation = usePostApiLogin();
@@ -329,6 +349,9 @@ const { data } = useGetApiDocuments({ pageNumber: 1, pageSize: 25 });
 
 const docMutation = usePostApiDocuments();
 await docMutation.mutateAsync({ data: { File: file } }); // For file uploads
+
+// Parties
+const { data: parties } = useGetApiParties({ pageNumber: 1, pageSize: 25 });
 ```
 
 **IMPORTANT - Axios Response Unwrapping**:
