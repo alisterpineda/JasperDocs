@@ -286,13 +286,22 @@ public class MyHandler(IOptionsMonitor<StorageOptions> storageOptions)
 **Routing**: TanStack Router with file-based routing
 - `/` - Home page
 - `/documents` - Protected documents list (index route)
-- `/documents/{id}` - Document detail view with PDF preview
+- `/documents/{id}` - Document detail view with PDF preview and party management
+- `/parties` - Protected parties list (index route)
+- `/parties/{id}` - Party detail view with edit functionality
 - `/login` - Authentication page
 
-**Document Preview** (`pages/DocumentDetail.tsx`):
+**Document Preview & Party Management** (`pages/DocumentDetail.tsx`):
 - PDFs: Fetches file via `AXIOS_INSTANCE` (includes auth token), creates blob URL for `<iframe>` preview
 - Other files: Shows "Preview not supported" message with MIME type
 - Blob URLs cleaned up on unmount to prevent memory leaks
+- Edit mode: `PartySelector` component for managing document-party associations (replace mode)
+- View mode: Displays associated parties as badges via `PartyBadge` component
+
+**Party Management** (`pages/Parties.tsx`, `pages/PartyDetail.tsx`):
+- List: Paginated table with create modal, click row to navigate to detail
+- Detail: View/edit party name, shows creation and update timestamps
+- Components: `PartyBadge` for display, `PartySelector` (multi-select) for associations
 
 **Nested Routes Pattern**: Parent routes with children must render `<Outlet />`:
 ```
@@ -301,13 +310,20 @@ routes/
   documents/
     index.tsx           # Child: /documents (list view)
     $documentId.tsx     # Child: /documents/{id} (detail view)
+  parties.tsx            # Parent: renders <Outlet /> for children
+  parties/
+    index.tsx           # Child: /parties (list view)
+    $partyId.tsx        # Child: /parties/{id} (detail view)
 ```
 
 **Structure**:
 ```
 src/
-  components/Layout/  # AppLayout, Navbar, Sidebar
-  pages/              # Home, Documents, Login
+  components/
+    Layout/           # AppLayout, Navbar, Sidebar
+    PartyBadge.tsx    # Badge component for displaying parties
+    PartySelector.tsx # Multi-select for party associations
+  pages/              # Home, Documents, DocumentDetail, Parties, PartyDetail, Login
   contexts/           # AuthContext (provider), auth-context (context definition)
   hooks/              # useAuth
   services/           # tokenRefresh (singleton for token management)

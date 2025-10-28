@@ -1,9 +1,11 @@
-import { Title, Container, Stack, Tabs, Center, Loader, Text, Box, TextInput, Textarea, Group, Button, Grid, Flex } from '@mantine/core'
+import { Title, Container, Stack, Tabs, Center, Loader, Text, Box, TextInput, Textarea, Group, Button, Flex } from '@mantine/core'
 import { useParams } from '@tanstack/react-router'
 import { useGetApiDocumentsId, usePutApiDocumentsId } from '../api/generated/documents/documents'
 import { useEffect, useState } from 'react'
 import { AXIOS_INSTANCE } from '../api/axios-instance'
 import { notifications } from '@mantine/notifications'
+import { PartyBadge } from '../components/PartyBadge'
+import { PartySelector } from '../components/PartySelector'
 
 export function DocumentDetail() {
   const { documentId } = useParams({ from: '/documents/$documentId' })
@@ -16,6 +18,7 @@ export function DocumentDetail() {
   const [isEditMode, setIsEditMode] = useState(false)
   const [editTitle, setEditTitle] = useState('')
   const [editDescription, setEditDescription] = useState('')
+  const [editPartyIds, setEditPartyIds] = useState<string[]>([])
 
   // Update mutation
   const { mutateAsync: updateDocument, isPending: isUpdating } = usePutApiDocumentsId()
@@ -28,6 +31,7 @@ export function DocumentDetail() {
     if (data) {
       setEditTitle(data.title)
       setEditDescription(data.description || '')
+      setEditPartyIds(data.parties?.map(p => p.id) || [])
       setIsEditMode(true)
     }
   }
@@ -36,6 +40,7 @@ export function DocumentDetail() {
     setIsEditMode(false)
     setEditTitle('')
     setEditDescription('')
+    setEditPartyIds([])
   }
 
   const handleSave = async () => {
@@ -45,6 +50,7 @@ export function DocumentDetail() {
         data: {
           title: editTitle,
           description: editDescription || null,
+          partyIds: editPartyIds,
         },
       })
 
@@ -196,6 +202,12 @@ export function DocumentDetail() {
             placeholder="Enter document description (optional)"
             rows={4}
           />
+          <PartySelector
+            value={editPartyIds}
+            onChange={setEditPartyIds}
+            label="Parties"
+            placeholder="Select parties"
+          />
           <Group>
             <Button
               onClick={handleSave}
@@ -221,6 +233,18 @@ export function DocumentDetail() {
         <div>
           <Text size="sm" fw={500} c="dimmed">Description</Text>
           <Text size="md">{data.description || 'No description'}</Text>
+        </div>
+        <div>
+          <Text size="sm" fw={500} c="dimmed">Parties</Text>
+          {data.parties && data.parties.length > 0 ? (
+            <Group gap="xs" mt="xs">
+              {data.parties.map((party) => (
+                <PartyBadge key={party.id} name={party.name} />
+              ))}
+            </Group>
+          ) : (
+            <Text size="md">No parties</Text>
+          )}
         </div>
         <Group>
           <Button onClick={handleEdit}>Edit</Button>
