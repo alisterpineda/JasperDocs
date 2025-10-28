@@ -1,3 +1,5 @@
+using JasperDocs.WebApi.Features.Parties;
+
 namespace JasperDocs.WebApi.Features.Documents;
 
 public class GetDocumentResponse
@@ -9,7 +11,7 @@ public class GetDocumentResponse
     public required DateTime UpdatedAt { get; init; }
     public required DocumentVersionDto SelectedVersion { get; init; }
     public required IReadOnlyList<DocumentVersionDto> AvailableVersions { get; init; }
-    public required IReadOnlyList<DocumentPartyDto> Parties { get; init; }
+    public required IReadOnlyList<PartyDto> Parties { get; init; }
 }
 
 public class DocumentVersionDto

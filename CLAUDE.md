@@ -110,12 +110,13 @@ builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandle
 
 **Endpoints**:
 - `GET /api/documents` - List documents with pagination (pageNumber, pageSize query params)
-- `GET /api/documents/{id}?versionNumber={optional}` - Get document with specific or latest version
+- `GET /api/documents/{id}?versionNumber={optional}` - Get document with specific or latest version (includes `parties` array)
 - `POST /api/documents` - Create document with file upload
+- `PUT /api/documents/{id}` - Update document (title, description, party associations)
 - `POST /api/documents/versions` - Create new version with file upload
 - `GET /api/documents/versions/{versionId}/file` - Download/stream document file (requires auth, returns file with proper MIME type)
 
-**DDD Pattern**: All Document-related endpoints under `DocumentsController` since Document is the aggregate root.
+**DDD Pattern**: All Document-related endpoints (including party associations) under `DocumentsController` since Document is the aggregate root.
 
 **File Access Security**: File download endpoint validates path traversal, ensures files are within DataDirectoryPath, and returns 404 if version/file not found.
 
@@ -126,17 +127,22 @@ builder.Services.AddScoped<IRequestHandler<CreateDocument>, CreateDocumentHandle
 - **DocumentParty** join table: Many-to-many relationship with Documents (DocumentId, PartyId, CreatedAt)
 - Cascade delete: Deleting Document or Party removes associations
 
-**Endpoints**:
+**Party Management Endpoints**:
 - `GET /api/parties` - List parties with pagination
 - `POST /api/parties` - Create party (body: `{ name: "..." }`)
 - `GET /api/parties/{id}` - Get party details
 - `PUT /api/parties/{id}` - Update party name
-- `GET /api/documents/{id}/parties` - List parties for document
-- `POST /api/documents/{id}/parties` - Associate party (body: `{ partyId: "..." }`)
-- `DELETE /api/documents/{id}/parties/{partyId}` - Remove association
-- `GET /api/documents/{id}` includes `parties` array
 
-**Behavior**: Add/remove operations are idempotent. Parties sorted alphabetically in responses.
+**Document-Party Association**: Managed via `PUT /api/documents/{id}`
+- Request body: `{ title: "...", description: "...", partyIds: ["guid1", "guid2", ...] }`
+- **Replace mode**: Completely replaces all party associations (not additive)
+- Empty `partyIds` array removes all parties
+- Validates all party IDs exist before changes (all-or-nothing, throws `ValidationException` if invalid)
+- Uses transaction for atomic updates
+- Duplicates automatically handled via `Distinct()`
+- View associations via `GET /api/documents/{id}` (includes `parties` array)
+
+**Behavior**: Parties sorted alphabetically in responses.
 
 ### Request/Response Flow
 

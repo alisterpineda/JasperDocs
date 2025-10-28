@@ -11,10 +11,6 @@ export interface AccessTokenResponse {
   refreshToken: string;
 }
 
-export interface AddPartyToDocumentRequest {
-  partyId: string;
-}
-
 export interface CreateParty {
   name: string;
 }
@@ -25,11 +21,6 @@ export interface DocumentListItemDto {
   /** @nullable */
   description?: string | null;
   createdAt: string;
-}
-
-export interface DocumentPartyDto {
-  id: string;
-  name: string;
 }
 
 export interface DocumentVersionDto {
@@ -55,7 +46,7 @@ export interface GetDocumentResponse {
   updatedAt: string;
   selectedVersion: DocumentVersionDto;
   availableVersions: DocumentVersionDto[];
-  parties: DocumentPartyDto[];
+  parties: PartyDto[];
 }
 
 export interface GetPartyResponse {
@@ -98,6 +89,11 @@ export interface PaginatedResponseOfPartyListItemDto {
   hasNextPage?: boolean;
 }
 
+export interface PartyDto {
+  id: string;
+  name: string;
+}
+
 export interface PartyListItemDto {
   id: string;
   name: string;
@@ -125,6 +121,7 @@ export interface UpdateDocumentRequest {
   title: string;
   /** @nullable */
   description?: string | null;
+  partyIds: string[];
 }
 
 export interface UpdatePartyRequest {

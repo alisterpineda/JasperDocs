@@ -35,9 +35,6 @@ builder.Services.AddScoped<IRequestHandler<ListDocuments, PaginatedResponse<Docu
 builder.Services.AddScoped<IRequestHandler<GetDocument, GetDocumentResponse>, GetDocumentHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateDocument>, UpdateDocumentHandler>();
 builder.Services.AddScoped<IRequestHandler<DownloadDocumentVersion, FileDownloadInfo>, DownloadDocumentVersionHandler>();
-builder.Services.AddScoped<IRequestHandler<AddPartyToDocument>, AddPartyToDocumentHandler>();
-builder.Services.AddScoped<IRequestHandler<RemovePartyFromDocument>, RemovePartyFromDocumentHandler>();
-builder.Services.AddScoped<IRequestHandler<ListDocumentParties, IReadOnlyList<DocumentPartyDto>>, ListDocumentPartiesHandler>();
 builder.Services.AddScoped<IRequestHandler<ListParties, PaginatedResponse<PartyListItemDto>>, ListPartiesHandler>();
 builder.Services.AddScoped<IRequestHandler<GetParty, GetPartyResponse>, GetPartyHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateParty>, CreatePartyHandler>();

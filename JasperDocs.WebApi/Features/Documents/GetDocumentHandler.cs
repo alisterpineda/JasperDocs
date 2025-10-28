@@ -1,5 +1,6 @@
 using JasperDocs.WebApi.Core;
 using JasperDocs.WebApi.Core.Exceptions;
+using JasperDocs.WebApi.Features.Parties;
 using JasperDocs.WebApi.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -58,7 +59,7 @@ public class GetDocumentHandler : IRequestHandler<GetDocument, GetDocumentRespon
 
         // Map all parties to DTOs
         var parties = document.DocumentParties
-            .Select(dp => new DocumentPartyDto
+            .Select(dp => new PartyDto
             {
                 Id = dp.Party.Id,
                 Name = dp.Party.Name

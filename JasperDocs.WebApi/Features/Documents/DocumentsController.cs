@@ -46,7 +46,8 @@ public class DocumentsController : ControllerBase
         {
             DocumentId = id,
             Title = request.Title,
-            Description = request.Description
+            Description = request.Description,
+            PartyIds = request.PartyIds
         };
         return requestHandler.HandleAsync(updateRequest, ct);
     }
@@ -82,51 +83,5 @@ public class DocumentsController : ControllerBase
             fileInfo.MimeType,
             fileInfo.FileName,
             fileInfo.EnableRangeProcessing);
-    }
-
-    [HttpGet("{id:guid}/parties")]
-    [ProducesResponseType<IReadOnlyList<DocumentPartyDto>>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task<IReadOnlyList<DocumentPartyDto>> ListDocumentPartiesAsync(
-        [FromServices] IRequestHandler<ListDocumentParties, IReadOnlyList<DocumentPartyDto>> requestHandler,
-        [FromRoute] Guid id,
-        CancellationToken ct = default)
-    {
-        var request = new ListDocumentParties { DocumentId = id };
-        return requestHandler.HandleAsync(request, ct);
-    }
-
-    [HttpPost("{id:guid}/parties")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task AddPartyToDocumentAsync(
-        [FromServices] IRequestHandler<AddPartyToDocument> requestHandler,
-        [FromRoute] Guid id,
-        [FromBody] AddPartyToDocumentRequest request,
-        CancellationToken ct = default)
-    {
-        var addRequest = new AddPartyToDocument
-        {
-            DocumentId = id,
-            PartyId = request.PartyId
-        };
-        return requestHandler.HandleAsync(addRequest, ct);
-    }
-
-    [HttpDelete("{id:guid}/parties/{partyId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task RemovePartyFromDocumentAsync(
-        [FromServices] IRequestHandler<RemovePartyFromDocument> requestHandler,
-        [FromRoute] Guid id,
-        [FromRoute] Guid partyId,
-        CancellationToken ct = default)
-    {
-        var removeRequest = new RemovePartyFromDocument
-        {
-            DocumentId = id,
-            PartyId = partyId
-        };
-        return requestHandler.HandleAsync(removeRequest, ct);
     }
 }
